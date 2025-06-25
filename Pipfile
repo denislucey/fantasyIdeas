@@ -8,6 +8,7 @@ nfl-data-py = "*"
 pandas = "*"
 scikit-learn = "*"
 make = "*"
+just = "*"
 
 [dev-packages]
 
