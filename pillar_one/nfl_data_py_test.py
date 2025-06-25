@@ -22,6 +22,11 @@ merged_df = df.merge(players[['player_id', 'full_name', 'position','rookie_year'
 
 def project_top_x_players_for_position(x: int, pos: str) -> None:
 
+    if pos in ['RB', 'WR', 'TE']:
+        feature_list = RandomForestFeatures.RB_FEATURES.value
+    else:
+        feature_list = RandomForestFeatures.QB_FEATURES.value
+
     pos_df = merged_df[merged_df['position'] == pos]
     pos_df['fantasy_ppr_ppg'] = pos_df['fantasy_points_ppr'] / pos_df['games']
     pos_df['years_in_league'] = pos_df['season'] - pos_df['rookie_year']
@@ -61,6 +66,7 @@ def project_top_x_players_for_position(x: int, pos: str) -> None:
 def main() -> str:
     # getting the data from 2015 to 2024
     # ML stuff that I need to better understand
+    project_top_x_players_for_position(35, 'QB')
     project_top_x_players_for_position(45, 'RB')
     project_top_x_players_for_position(45, 'WR')
     project_top_x_players_for_position(25, 'TE')

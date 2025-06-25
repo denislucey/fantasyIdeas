@@ -16,6 +16,21 @@ class RandomForestFeatures(Enum):
     'age'
     ]
 
+    QB_FEATURES = [
+       'completions', 'attempts',
+        'passing_yards', 'passing_tds', 'interceptions', 'sacks', 'sack_yards',
+        'sack_fumbles', 'sack_fumbles_lost', 'passing_air_yards',
+        'passing_yards_after_catch', 'passing_first_downs', 'passing_epa',
+        'passing_2pt_conversions', 'pacr', 'dakota', 'carries', 'rushing_yards',
+        'rushing_tds', 'rushing_fumbles', 'rushing_fumbles_lost',
+        'rushing_first_downs', 'rushing_epa', 'rushing_2pt_conversions',
+        'receptions', 'targets', 'air_yards_share',
+        'wopr_x', 'special_teams_tds', 'fantasy_points', 'fantasy_points_ppr',
+        'games', 'yac_sh', 'wopr_y', 'ry_sh', 'rtd_sh',
+        'rfd_sh', 'rtdfd_sh', 'yptmpa', 'ppr_sh', 'years_in_league',
+        'age' 
+    ]
+
 """
 test_features = [
     'completions', 'attempts',
