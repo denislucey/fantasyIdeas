@@ -1,6 +1,7 @@
 import nfl_data_py as nfl
 import pandas as pd
 from sklearn.model_selection import train_test_split
+from sklearn.model_selection import GridSearchCV
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import mean_absolute_error
 from constants import RandomForestFeatures
@@ -49,7 +50,6 @@ def project_top_x_players_for_position(x: int, pos: str) -> None:
         # pos_df[feature + '_minus_two'] = pos_df.groupby('player_id')[feature].shift(2)
         # feature_list.append(feature + '_minus_two')
 
-    next_season_players = pos_df[pos_df['season'] == 2024]
     pos_df = pos_df.dropna(subset=['next_season_fantasy_points'])
 
     X = pos_df[feature_list]
@@ -67,23 +67,18 @@ def project_top_x_players_for_position(x: int, pos: str) -> None:
     mae = mean_absolute_error(y_test, predictions)
     print(f"Model's Average Error: {mae:.2f} fantasy points")
 
-    importances = model.feature_importances_
-    feature_names = X_train.columns
-    feat_imp_df = pd.DataFrame({
-        'feature': feature_names,
-        'importance': importances
-    }).sort_values(by='importance', ascending=False)
-    print(feat_imp_df)
+    param_grid = {
+    'n_estimators': [100],
+    'max_depth': [10, 20, None],
+    'min_samples_leaf': [1, 3, 5],
+    'max_features': ['sqrt', 0.3, 0.5]
+    }
 
+    grid = GridSearchCV(RandomForestRegressor(random_state=42), param_grid, cv=5, scoring='neg_mean_absolute_error', n_jobs=-1)
+    grid.fit(X, y)
 
-    # creating the next season predictions and using them to print the top 45 players
-    next_season_predictions = model.predict(next_season_players[feature_list])
-
-    next_season_players['predicted_fantasy_ppr_ppg'] = next_season_predictions * 17
-    condensed = next_season_players[['full_name', 'player_id', 'predicted_fantasy_ppr_ppg']]
-    
-    print(f"Top {x} projected {pos} for the 2025 season:")
-    print(condensed.sort_values('predicted_fantasy_ppr_ppg',ascending=False).head(x))
+    print("Best Params:", grid.best_params_)
+    print("Best MAE:", -grid.best_score_)
 
     return
 
@@ -91,8 +86,8 @@ def project_top_x_players_for_position(x: int, pos: str) -> None:
 def main() -> str:
     # getting the data from 2015 to 2024
     # ML stuff that I need to better understand
-    # project_top_x_players_for_position(35, 'QB')
-    project_top_x_players_for_position(45, 'RB')
+    project_top_x_players_for_position(35, 'QB')
+    # project_top_x_players_for_position(45, 'RB')
     # project_top_x_players_for_position(45, 'WR')
     # project_top_x_players_for_position(25, 'TE')
     return "Yes"

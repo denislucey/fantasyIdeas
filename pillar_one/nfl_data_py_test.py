@@ -36,7 +36,7 @@ def project_top_x_players_for_position(x: int, pos: str) -> None:
     next_season_players = pos_df[pos_df['season'] == 2024]
     pos_df = pos_df.dropna(subset=['next_season_fantasy_points'])
 
-    X = pos_df[RandomForestFeatures.RB_FEATURES.value]
+    X = pos_df[feature_list]
     y = pos_df['next_season_fantasy_ppr_ppg']
 
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
@@ -52,7 +52,7 @@ def project_top_x_players_for_position(x: int, pos: str) -> None:
 
 
     # creating the next season predictions and using them to print the top 45 players
-    next_season_predictions = model.predict(next_season_players[RandomForestFeatures.RB_FEATURES.value])
+    next_season_predictions = model.predict(next_season_players[feature_list])
 
     next_season_players['predicted_fantasy_ppr_ppg'] = next_season_predictions * 17
     condensed = next_season_players[['full_name', 'player_id', 'predicted_fantasy_ppr_ppg']]
