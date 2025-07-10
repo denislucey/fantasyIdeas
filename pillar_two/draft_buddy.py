@@ -1,6 +1,9 @@
 import pandas as pd
 
 
+# NEED TO ADD PLAYERS AS A DF
+# NEED TO ADD logic to parse the best players from a df
+
 class Player:
     def __init__(self, name: str, pos: str, points: float, pick: int):
         self.name = name
@@ -55,16 +58,16 @@ class Roster:
                 self.FLEX = player
         self.total_points += player.points
 
-    def draft_QB(self):
+    def can_draft_QB(self):
         return self.QB is None
     
-    def draft_RB(self):
+    def can_draft_RB(self):
         return self.RB1 is None or self.RB2 is None or self.FLEX is None
 
-    def draft_WR(self):
+    def can_draft_WR(self):
         return self.WR1 is None or self.WR2 is None or self.FLEX is None
 
-    def draft_TE(self):
+    def can_draft_TE(self):
         return self.TE is None or self.FLEX is None
 
 
@@ -75,26 +78,44 @@ def draft_buddy_wrapper(pick: int, three_rr: bool = False):
 
     # create the array of draft picks
     draft_picks = [8,25,40,57,72,98,104]
-    return draft_buddy(pick,1,players,roster=Roster())
+    return draft_buddy(draft_picks,1,players,roster=Roster())
 
-def draft_buddy(picks: arr[int], round: int, player_df: pd.DataFrame, roster: Roster):
+def draft_buddy(picks, pick_round: int, player_df: pd.DataFrame, roster: Roster):
     
-    if round > 7:
+    if pick_round > 7:
         return roster
     
-    best_QB
-    best_RB
-    best_WR
-    best_TE
+    cur_pick = picks[pick_round-1]
 
-    if roster.draft_QB:
-        draft_QB_roster = draft_buddy(picks,round+1,player_df,roster.add_player(best_QB))
+    # Need to figure this out
+    if roster.can_draft_QB():
+        draft_QB_roster = draft_buddy(picks,pick_round+1,player_df,roster.add_player(best_QB))
         roster.remove_player(best_QB)
+    else:
+        draft_QB_roster = roster
     
+    if roster.can_draft_RB():
+        draft_RB_roster = draft_buddy(picks,pick_round+1,player_df,roster.add_player(best_RB))
+        roster.remove_player(best_RB)
+    else:
+        draft_RB_roster = roster
     
-    
-    
-    return roster
+    if roster.can_draft_WR():
+        draft_WR_roster = draft_buddy(picks,pick_round+1,player_df,roster.add_player(best_WR))
+        roster.remove_player(best_WR)
+    else:
+        draft_WR_roster = roster
+
+    if roster.can_draft_TE():
+        draft_TE_roster = draft_buddy(picks,pick_round+1,player_df,roster.add_player(best_TE))
+        roster.remove_player(best_TE)
+    else:
+        draft_TE_roster = roster
+
+    # return the roster with the highest points
+    rosters = [draft_QB_roster, draft_RB_roster, draft_WR_roster, draft_TE_roster]
+    best_roster = max(rosters, key=lambda r: r.total_points)
+    return best_roster
 
 def main():
     draft_buddy_wrapper(pick=1,three_rr=False)
