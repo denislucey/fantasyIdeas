@@ -205,8 +205,11 @@ def draft_buddy(picks, pick_round: int, player_df: pd.DataFrame, roster: Roster)
     return best_roster
 
 def main():
-    best_roster = draft_buddy_wrapper(pick=4,thr_rr=True)
-    print(best_roster)
+    for i in range(1,17):
+        print(f"Pick: {i}")
+        print(f"Score: {draft_buddy_wrapper(pick=i,thr_rr=True)}")
+    # best_roster = draft_buddy_wrapper(pick=11,thr_rr=False)
+    # print(best_roster)
 
 
 main()
