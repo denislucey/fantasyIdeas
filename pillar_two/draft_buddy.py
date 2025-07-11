@@ -142,9 +142,9 @@ class Roster:
                 self.FLEX = None
 
 
-def draft_buddy_wrapper(pick: int, three_rr: bool = False):
+def draft_buddy_wrapper(pick: int, thr_rr: bool = False):
     #create the data frame
-    if three_rr:
+    if thr_rr:
         draft_picks = three_rr[pick]
     else:
         draft_picks = no_three_rr[pick]
@@ -205,7 +205,7 @@ def draft_buddy(picks, pick_round: int, player_df: pd.DataFrame, roster: Roster)
     return best_roster
 
 def main():
-    best_roster = draft_buddy_wrapper(pick=3,three_rr=False)
+    best_roster = draft_buddy_wrapper(pick=4,thr_rr=True)
     print(best_roster)
 
 
