@@ -15,7 +15,7 @@ def draft_buddy_wrapper(pick: int, thr_rr: bool = False):
 
 def draft_buddy(picks, pick_round: int, player_df: pd.DataFrame, roster: Roster):
     
-    if pick_round > 7:
+    if pick_round > 8:
         return roster
     
     cur_pick = picks[pick_round-1]
