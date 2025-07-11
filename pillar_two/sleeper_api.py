@@ -1,7 +1,7 @@
 from sleeperpy import Drafts
 from draft_picks import get_picks
 from classes import Player, Roster
-from draft_buddy import draft_buddy
+from draft_buddy import draft_buddy_selective
 import pandas as pd
 import os
 
@@ -46,13 +46,13 @@ def sleeper_draft_buddy(draft_id: str, spot: int, thr_rr: bool):
 
     remaining_players = filtered_players[~filtered_players['Name'].isin(taken_players)]
 
-    best_roster = draft_buddy(picks,len(my_players)+1,remaining_players,my_roster)
+    best_roster = draft_buddy_selective(picks,len(my_players)+1,remaining_players,my_roster)
     print(best_roster)
     # call draft buddy
 
 
 
 def main():
-    return sleeper_draft_buddy('1249429883939979264',9,False)
+    return sleeper_draft_buddy('1249468055386345472',16,False)
 
 main()
