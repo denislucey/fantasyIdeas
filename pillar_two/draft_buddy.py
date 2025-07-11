@@ -2,6 +2,8 @@ import pandas as pd
 import os
 import copy
 
+from draft_picks import three_rr, no_three_rr
+
 # NEED TO ADD PLAYERS AS A DF
 # NEED TO ADD logic to parse the best players from a df
 
@@ -11,7 +13,7 @@ class Player:
         self.name = name
         self.pos = pos
         self.points = points
-        self.round = pick // 16 + 1
+        self.round = (pick-1) // 16 + 1
         self.pick = pick
 
 class Roster:
@@ -73,6 +75,40 @@ class Roster:
     def can_draft_TE(self):
         return self.TE is None or self.FLEX is None
     
+    def get_QB(self):
+        qbs = []
+        if self.QB:
+            qbs.append(self.QB.name)
+        return qbs
+        
+    def get_RB(self):
+        rbs = []
+        if self.RB1:
+            rbs.append(self.RB1.name)
+        if self.RB2:
+            rbs.append(self.RB2.name)
+        if self.FLEX and self.FLEX.pos == 'RB':
+            rbs.append(self.FLEX.name)
+        return rbs
+    
+    def get_WR(self):
+        wrs = []
+        if self.WR1:
+            wrs.append(self.WR1.name)
+        if self.WR2:
+            wrs.append(self.WR2.name)
+        if self.FLEX and self.FLEX.pos == 'WR':
+            wrs.append(self.FLEX.name)
+        return wrs
+    
+    def get_TE(self):
+        tes = []
+        if self.TE:
+            tes.append(self.TE.name)
+        if self.FLEX and self.FLEX.pos == 'TE':
+            tes.append(self.FLEX.name)
+        return tes
+    
     def remove_player(self, player: Player):
         if player.pos == 'QB' and self.QB == player:
             self.total_points -= player.points
@@ -109,13 +145,15 @@ class Roster:
 def draft_buddy_wrapper(pick: int, three_rr: bool = False):
     #create the data frame
     if three_rr:
-        pick += 1
+        draft_picks = three_rr[pick]
+    else:
+        draft_picks = no_three_rr[pick]
 
     players = pd.read_csv(os.path.dirname(os.path.realpath(__file__)) + '\\players_with_adp.csv')
     filtered_players = players[['Name', 'Points', 'Position','ADP']].dropna()
     # print(filtered_players.head(10))
     # create the array of draft picks
-    draft_picks = [8,25,40,57,72,98,104]
+    # draft_picks = [8,25,40,57,72,89,104]
     return draft_buddy(draft_picks,1,filtered_players,roster=Roster())
 
 def draft_buddy(picks, pick_round: int, player_df: pd.DataFrame, roster: Roster):
@@ -126,7 +164,7 @@ def draft_buddy(picks, pick_round: int, player_df: pd.DataFrame, roster: Roster)
     cur_pick = picks[pick_round-1]
     # Need to figure this out
     if roster.can_draft_QB():
-        best_QB = player_df[(player_df['Position'] == 'QB') & (player_df['ADP'] >= cur_pick)].sort_values(by='Points', ascending=False).iloc[0]
+        best_QB = player_df[(player_df['Position'] == 'QB') & (player_df['ADP'] >= cur_pick) & ~player_df['Name'].isin(roster.get_QB())].sort_values(by='Points', ascending=False).iloc[0]
         best_QB = Player(name=best_QB['Name'], pos=best_QB['Position'], points=best_QB['Points'], pick=cur_pick)
         draft_QB_roster = copy.deepcopy(roster)
         draft_QB_roster.add_player(best_QB)
@@ -135,7 +173,7 @@ def draft_buddy(picks, pick_round: int, player_df: pd.DataFrame, roster: Roster)
         draft_QB_roster = roster
     
     if roster.can_draft_RB():
-        best_RB = player_df[(player_df['Position'] == 'RB') & (player_df['ADP'] >= cur_pick)].sort_values(by='Points', ascending=False).iloc[0]
+        best_RB = player_df[(player_df['Position'] == 'RB') & (player_df['ADP'] >= cur_pick) & ~player_df['Name'].isin(roster.get_RB())].sort_values(by='Points', ascending=False).iloc[0]
         best_RB = Player(name=best_RB['Name'], pos=best_RB['Position'], points=best_RB['Points'], pick=cur_pick)
         draft_RB_roster = copy.deepcopy(roster)
         draft_RB_roster.add_player(best_RB)
@@ -144,7 +182,7 @@ def draft_buddy(picks, pick_round: int, player_df: pd.DataFrame, roster: Roster)
         draft_RB_roster = roster
     
     if roster.can_draft_WR():
-        best_WR = player_df[(player_df['Position'] == 'WR') & (player_df['ADP'] >= cur_pick)].sort_values(by='Points', ascending=False).iloc[0]
+        best_WR = player_df[(player_df['Position'] == 'WR') & (player_df['ADP'] >= cur_pick) & ~player_df['Name'].isin(roster.get_WR())].sort_values(by='Points', ascending=False).iloc[0]
         best_WR = Player(name=best_WR['Name'], pos=best_WR['Position'], points=best_WR['Points'], pick=cur_pick)
         draft_WR_roster = copy.deepcopy(roster)
         draft_WR_roster.add_player(best_WR)
@@ -153,9 +191,10 @@ def draft_buddy(picks, pick_round: int, player_df: pd.DataFrame, roster: Roster)
         draft_WR_roster = roster
 
     if roster.can_draft_TE():
-        best_TE = player_df[(player_df['Position'] == 'TE') & (player_df['ADP'] >= cur_pick)].sort_values(by='Points', ascending=False).iloc[0]
+        best_TE = player_df[(player_df['Position'] == 'TE') & (player_df['ADP'] >= cur_pick) & ~player_df['Name'].isin(roster.get_TE())].sort_values(by='Points', ascending=False).iloc[0]
         best_TE = Player(name=best_TE['Name'], pos=best_TE['Position'], points=best_TE['Points'], pick=cur_pick)
         draft_TE_roster = copy.deepcopy(roster)
+        draft_TE_roster.add_player(best_TE)
         draft_TE_roster = draft_buddy(picks,pick_round+1,player_df,draft_TE_roster)
     else:
         draft_TE_roster = roster
@@ -166,7 +205,7 @@ def draft_buddy(picks, pick_round: int, player_df: pd.DataFrame, roster: Roster)
     return best_roster
 
 def main():
-    best_roster = draft_buddy_wrapper(pick=1,three_rr=False)
+    best_roster = draft_buddy_wrapper(pick=3,three_rr=False)
     print(best_roster)
 
 
