@@ -4,19 +4,13 @@ import copy
 from draft_picks import get_picks
 from classes import Roster, Player
 
-# NEED TO ADD PLAYERS AS A DF
-# NEED TO ADD logic to parse the best players from a df
-
-
 def draft_buddy_wrapper(pick: int, thr_rr: bool = False):
     #create the data frame
     draft_picks = get_picks(pick,thr_rr)
 
     players = pd.read_csv(os.path.dirname(os.path.realpath(__file__)) + '\\players_with_adp.csv')
     filtered_players = players[['Name', 'Points', 'Position','ADP']].dropna()
-    # print(filtered_players.head(10))
-    # create the array of draft picks
-    # draft_picks = [8,25,40,57,72,89,104]
+    
     return draft_buddy(draft_picks,1,filtered_players,roster=Roster())
 
 def draft_buddy(picks, pick_round: int, player_df: pd.DataFrame, roster: Roster):
@@ -75,4 +69,4 @@ def main():
     print(best_roster)
 
 
-main()
+# main()
