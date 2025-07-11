@@ -36,3 +36,11 @@ no_three_rr = {
     15: [15, 18, 47, 50, 79, 82, 111],
     16: [16, 17, 48, 49, 80, 81, 112]
 }
+
+def get_picks(spot: int, thr_rr: bool):
+    if thr_rr:
+        draft_picks = three_rr[spot]
+    else:
+        draft_picks = no_three_rr[spot]
+
+    return draft_picks
