@@ -7,9 +7,16 @@ The big to-do as of right now is to add context.
 
 Adding pillar 2, which is a draft buddy
 Using recursion to try each positional picks for the starting lineup
+Is now connected to sleeper and runs 8 rounds deep
 
-Next steps are:
-Adding a connection to sleeper
-distinguishing between live pick and not
-Making it specific for the first pick
-going to general/a generic player view using a probability model
+I like that it is quick
+I like that it is seamless and clear
+I do not like how RB heavy it is (quad barrel!)
+I do not like that it only looks at the top option (reaching for CaLose to an insane degree)
+I do not like the current value calculation for a team
+
+ToDo:
+Redo value function
+Expand draft (add recursion depth?)
+Have the functions potentially look at two players:
+BPA as well as the best available before next pick.

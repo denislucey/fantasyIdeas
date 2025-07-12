@@ -5,6 +5,7 @@ from draft_buddy import draft_buddy_selective
 from scipy.stats import norm
 import pandas as pd
 import os
+import time
 
 def sleeper_api_call(draft_id: str, picks):
     draft_results = Drafts.get_all_picks_in_draft(draft_id)
@@ -54,6 +55,8 @@ def sleeper_draft_buddy(draft_id: str, spot: int, thr_rr: bool):
 
 
 def main():
-    return sleeper_draft_buddy('1249557629873700865',7,False)
+    start_time = time.time()
+    sleeper_draft_buddy('1249608742584987648',7,False)
+    print(f"Exectution Time: {time.time() - start_time}")
 
 main()
