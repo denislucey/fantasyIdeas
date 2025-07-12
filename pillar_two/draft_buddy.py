@@ -16,7 +16,7 @@ def draft_buddy_wrapper(pick: int, thr_rr: bool = False):
 
 def draft_buddy(picks, pick_round: int, player_df: pd.DataFrame, roster: Roster):
     
-    if pick_round > 8:
+    if pick_round > 9:
         return roster
     
     cur_pick = picks[pick_round-1]
@@ -62,8 +62,10 @@ def draft_buddy(picks, pick_round: int, player_df: pd.DataFrame, roster: Roster)
     best_roster = max(rosters, key=lambda r: r.total_points)
     return best_roster
 
+
+# Called when you are on the clock, assumes you can draft any available player
 def draft_buddy_selective(picks,pick_round,player_df,roster):
-    if pick_round > 8:
+    if pick_round > 9:
         return roster
     
     cur_pick = picks[pick_round-1]
@@ -78,13 +80,13 @@ def draft_buddy_selective(picks,pick_round,player_df,roster):
         draft_QB_roster = draft_buddy_abstract(picks,pick_round+1,player_df,draft_QB_roster)
         branches.append(draft_QB_roster)
 
-        best_last_chance_QB = player_df[(player_df['Position'] == 'QB') & ~player_df['Name'].isin(roster.get_QB()) & (player_df['ADP'] <= picks[pick_round])].sort_values(by='Points', ascending=False).iloc[0]
-        if best_last_chance_QB['Name'] != best_QB.name:
-            best_last_chance_QB = Player(name=best_last_chance_QB['Name'], pos='QB', points=best_last_chance_QB['Points'], pick=cur_pick)
-            draft_last_chance_QB_roster = copy.deepcopy(roster)
-            draft_last_chance_QB_roster.add_player(best_QB)
-            draft_last_chance_QB_roster = draft_buddy_abstract(picks,pick_round+1,player_df,draft_last_chance_QB_roster)
-            branches.append(draft_last_chance_QB_roster)
+        # best_last_chance_QB = player_df[(player_df['Position'] == 'QB') & ~player_df['Name'].isin(roster.get_QB()) & (player_df['ADP'] <= picks[pick_round])].sort_values(by='Points', ascending=False).iloc[0]
+        # if best_last_chance_QB['Name'] != best_QB.name:
+        #     best_last_chance_QB = Player(name=best_last_chance_QB['Name'], pos='QB', points=best_last_chance_QB['Points'], pick=cur_pick)
+        #     draft_last_chance_QB_roster = copy.deepcopy(roster)
+        #     draft_last_chance_QB_roster.add_player(best_QB)
+        #     draft_last_chance_QB_roster = draft_buddy_abstract(picks,pick_round+1,player_df,draft_last_chance_QB_roster)
+        #     branches.append(draft_last_chance_QB_roster)
     
     if roster.can_draft_RB():
         best_RB = player_df[(player_df['Position'] == 'RB') & ~player_df['Name'].isin(roster.get_RB())].sort_values(by='Points', ascending=False).iloc[0]
@@ -94,13 +96,13 @@ def draft_buddy_selective(picks,pick_round,player_df,roster):
         draft_RB_roster = draft_buddy_abstract(picks,pick_round+1,player_df,draft_RB_roster)
         branches.append(draft_RB_roster)
 
-        best_last_chance_RB = player_df[(player_df['Position'] == 'RB') & ~player_df['Name'].isin(roster.get_RB()) & (player_df['ADP'] <= picks[pick_round])].sort_values(by='Points', ascending=False).iloc[0]
-        if best_last_chance_RB['Name'] != best_RB.name:
-            best_last_chance_RB = Player(name=best_last_chance_RB['Name'], pos='RB', points=best_last_chance_RB['Points'], pick=cur_pick)
-            draft_last_chance_RB_roster = copy.deepcopy(roster)
-            draft_last_chance_RB_roster.add_player(best_RB)
-            draft_last_chance_RB_roster = draft_buddy_abstract(picks,pick_round+1,player_df,draft_last_chance_RB_roster)
-            branches.append(draft_last_chance_RB_roster)
+        # best_last_chance_RB = player_df[(player_df['Position'] == 'RB') & ~player_df['Name'].isin(roster.get_RB()) & (player_df['ADP'] <= picks[pick_round])].sort_values(by='Points', ascending=False).iloc[0]
+        # if best_last_chance_RB['Name'] != best_RB.name:
+        #     best_last_chance_RB = Player(name=best_last_chance_RB['Name'], pos='RB', points=best_last_chance_RB['Points'], pick=cur_pick)
+        #     draft_last_chance_RB_roster = copy.deepcopy(roster)
+        #     draft_last_chance_RB_roster.add_player(best_RB)
+        #     draft_last_chance_RB_roster = draft_buddy_abstract(picks,pick_round+1,player_df,draft_last_chance_RB_roster)
+        #     branches.append(draft_last_chance_RB_roster)
     
     if roster.can_draft_WR():
         best_WR = player_df[(player_df['Position'] == 'WR') & ~player_df['Name'].isin(roster.get_WR())].sort_values(by='Points', ascending=False).iloc[0]
@@ -110,13 +112,13 @@ def draft_buddy_selective(picks,pick_round,player_df,roster):
         draft_WR_roster = draft_buddy_abstract(picks,pick_round+1,player_df,draft_WR_roster)
         branches.append(draft_WR_roster)
 
-        best_last_chance_WR = player_df[(player_df['Position'] == 'WR') & ~player_df['Name'].isin(roster.get_WR()) & (player_df['ADP'] <= picks[pick_round])].sort_values(by='Points', ascending=False).iloc[0]
-        if best_last_chance_WR['Name'] != best_WR.name:
-            best_last_chance_WR = Player(name=best_last_chance_WR['Name'], pos='WR', points=best_last_chance_WR['Points'], pick=cur_pick)
-            draft_last_chance_WR_roster = copy.deepcopy(roster)
-            draft_last_chance_WR_roster.add_player(best_WR)
-            draft_last_chance_WR_roster = draft_buddy_abstract(picks,pick_round+1,player_df,draft_last_chance_WR_roster)
-            branches.append(draft_last_chance_WR_roster)
+        # best_last_chance_WR = player_df[(player_df['Position'] == 'WR') & ~player_df['Name'].isin(roster.get_WR()) & (player_df['ADP'] <= picks[pick_round])].sort_values(by='Points', ascending=False).iloc[0]
+        # if best_last_chance_WR['Name'] != best_WR.name:
+        #     best_last_chance_WR = Player(name=best_last_chance_WR['Name'], pos='WR', points=best_last_chance_WR['Points'], pick=cur_pick)
+        #     draft_last_chance_WR_roster = copy.deepcopy(roster)
+        #     draft_last_chance_WR_roster.add_player(best_WR)
+        #     draft_last_chance_WR_roster = draft_buddy_abstract(picks,pick_round+1,player_df,draft_last_chance_WR_roster)
+        #     branches.append(draft_last_chance_WR_roster)
 
     if roster.can_draft_TE():
         best_TE = player_df[(player_df['Position'] == 'TE') & ~player_df['Name'].isin(roster.get_TE())].sort_values(by='Points', ascending=False).iloc[0]
@@ -160,7 +162,7 @@ def calculate_est_val(available_players,cur_pick):
 
 def draft_buddy_abstract(picks,pick_round,player_df,roster):
     
-    if pick_round > 8:
+    if pick_round > 9:
         return roster
     
     cur_pick = picks[pick_round-1]

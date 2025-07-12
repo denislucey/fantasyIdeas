@@ -56,7 +56,7 @@ def sleeper_draft_buddy(draft_id: str, spot: int, thr_rr: bool):
 
 def main():
     start_time = time.time()
-    sleeper_draft_buddy('1249608742584987648',7,False)
+    sleeper_draft_buddy('1249780263592939520',2,False)
     print(f"Exectution Time: {time.time() - start_time}")
 
 main()
