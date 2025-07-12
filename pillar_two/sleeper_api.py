@@ -2,6 +2,7 @@ from sleeperpy import Drafts
 from draft_picks import get_picks
 from classes import Player, Roster
 from draft_buddy import draft_buddy_selective
+from scipy.stats import norm
 import pandas as pd
 import os
 
@@ -27,7 +28,7 @@ def sleeper_draft_buddy(draft_id: str, spot: int, thr_rr: bool):
 
     #import players
     players = pd.read_csv(os.path.dirname(os.path.realpath(__file__)) + '\\players_with_adp.csv')
-    filtered_players = players[['Name', 'Points', 'Position','ADP']].dropna()
+    filtered_players = players[['Name', 'Points', 'Position','ADP']].fillna(500)
 
     # get players you have drafted
     my_players = []
@@ -53,6 +54,6 @@ def sleeper_draft_buddy(draft_id: str, spot: int, thr_rr: bool):
 
 
 def main():
-    return sleeper_draft_buddy('1249493500567769088',10,False)
+    return sleeper_draft_buddy('1222767773441064960',14,False)
 
 main()
