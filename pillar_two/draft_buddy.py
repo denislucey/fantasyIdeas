@@ -116,7 +116,7 @@ def calculate_est_val(available_players,cur_pick):
     i = 0
     while used_prob < 0.95:
         cur_player = available_players.iloc[i]
-        chance_of_getting = 1 - norm.cdf(cur_pick-1, loc = cur_player['ADP'], scale = cur_player['ADP']/10)
+        chance_of_getting = 1 - norm.cdf(cur_pick-1, loc = cur_player['ADP'], scale = cur_player['ADP']/15)
         
         # Think of a better solution
         
@@ -182,11 +182,11 @@ def draft_buddy_abstract(picks,pick_round,player_df,roster):
     return best_roster
 
 def main():
-    # for i in range(1,17):
-        # print(f"Pick: {i}")
-        # print(f"Score: {draft_buddy_wrapper(pick=i,thr_rr=True)}")
-    best_roster = draft_buddy_wrapper(pick=11,thr_rr=False)
-    print(best_roster)
+    for i in range(1,17):
+        print(f"Pick: {i}")
+        print(f"Score: {draft_buddy_wrapper(pick=i,thr_rr=False)}")
+    # best_roster = draft_buddy_wrapper(pick=16,thr_rr=False)
+    # print(best_roster)
 
 
-# main()
+main()

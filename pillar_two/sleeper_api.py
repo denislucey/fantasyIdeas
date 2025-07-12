@@ -54,6 +54,6 @@ def sleeper_draft_buddy(draft_id: str, spot: int, thr_rr: bool):
 
 
 def main():
-    return sleeper_draft_buddy('1222767773441064960',14,False)
+    return sleeper_draft_buddy('1249557629873700865',7,False)
 
 main()

@@ -44,6 +44,7 @@ class Roster:
                 self.FLEX = player
             elif self.FLEX2 is None:
                 self.FLEX2 = player
+                self.total_points -= player.points * 0.5
         elif player.pos == 'WR':
             if self.WR1 is None:
                 self.WR1 = player
@@ -53,6 +54,7 @@ class Roster:
                 self.FLEX = player
             elif self.FLEX2 is None:
                 self.FLEX2 = player
+                self.total_points -= player.points * 0.5
         elif player.pos == 'TE':
             if self.TE is None:
                 self.TE = player
@@ -60,11 +62,12 @@ class Roster:
                 self.FLEX = player
             elif self.FLEX2 is None:
                 self.FLEX2 = player
+                self.total_points -= player.points * 0.5
         self.total_points += player.points
 
     def can_draft_QB(self):
         return self.QB is None
-    
+  
     def can_draft_RB(self):
         return self.RB1 is None or self.RB2 is None or self.FLEX is None or self.FLEX2 is None
 
@@ -73,13 +76,13 @@ class Roster:
 
     def can_draft_TE(self):
         return self.TE is None or self.FLEX is None or self.FLEX2 is None
-    
+
     def get_QB(self):
         qbs = []
         if self.QB:
             qbs.append(self.QB.name)
         return qbs
-        
+  
     def get_RB(self):
         rbs = []
         if self.RB1:
@@ -91,7 +94,7 @@ class Roster:
         if self.FLEX2 and self.FLEX2.pos == 'RB':
             rbs.append(self.FLEX2.name)
         return rbs
-    
+
     def get_WR(self):
         wrs = []
         if self.WR1:
@@ -103,7 +106,7 @@ class Roster:
         if self.FLEX2 and self.FLEX2.pos == 'WR':
             wrs.append(self.FLEX2.name)
         return wrs
-    
+
     def get_TE(self):
         tes = []
         if self.TE:
@@ -113,7 +116,7 @@ class Roster:
         if self.FLEX2 and self.FLEX2.pos == 'TE':
             tes.append(self.FLEX2.name)
         return tes
-    
+
     def remove_player(self, player: Player):
         if player.pos == 'QB' and self.QB == player:
             self.total_points -= player.points
@@ -129,7 +132,7 @@ class Roster:
                 self.total_points -= player.points
                 self.FLEX = None
             elif self.FLEX2 == player:
-                self.total_points -= player.points
+                self.total_points -= player.points * 0.5
                 self.FLEX2 = None 
         elif player.pos == 'WR':
             if self.WR1 == player:
@@ -142,7 +145,7 @@ class Roster:
                 self.total_points -= player.points
                 self.FLEX = None
             elif self.FLEX2 == player:
-                self.total_points -= player.points
+                self.total_points -= player.points * 0.5
                 self.FLEX2 = None
         elif player.pos == 'TE':
             if self.TE == player:
@@ -152,5 +155,5 @@ class Roster:
                 self.total_points -= player.points
                 self.FLEX = None
             elif self.FLEX2 == player:
-                self.total_points -= player.points
+                self.total_points -= player.points * 0.5
                 self.FLEX2 = None
