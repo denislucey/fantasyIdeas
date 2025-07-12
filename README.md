@@ -20,3 +20,4 @@ Redo value function
 Expand draft (add recursion depth?)
 Have the functions potentially look at two players:
 BPA as well as the best available before next pick.
+I also should redo my data properly, to something I agree with much more, currently only espn data
