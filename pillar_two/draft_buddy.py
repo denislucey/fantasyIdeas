@@ -16,7 +16,7 @@ def draft_buddy_wrapper(pick: int, thr_rr: bool = False):
 
 def draft_buddy(picks, pick_round: int, player_df: pd.DataFrame, roster: Roster):
     
-    if pick_round > 9:
+    if pick_round > 7:
         return roster
     
     cur_pick = picks[pick_round-1]
@@ -65,7 +65,7 @@ def draft_buddy(picks, pick_round: int, player_df: pd.DataFrame, roster: Roster)
 
 # Called when you are on the clock, assumes you can draft any available player
 def draft_buddy_selective(picks,pick_round,player_df,roster):
-    if pick_round > 9:
+    if pick_round > 7:
         return roster
     
     cur_pick = picks[pick_round-1]
@@ -162,7 +162,7 @@ def calculate_est_val(available_players,cur_pick):
 
 def draft_buddy_abstract(picks,pick_round,player_df,roster):
     
-    if pick_round > 9:
+    if pick_round > 7:
         return roster
     
     cur_pick = picks[pick_round-1]

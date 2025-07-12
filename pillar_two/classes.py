@@ -11,176 +11,84 @@ class Roster:
     """Represents a team"""
     def __init__(self):
         self.total_points = 0
-        self.QB = None
-        self.RB1 = None
-        self.RB2 = None
-        self.WR1 = None
-        self.WR2 = None
-        self.TE = None
-        self.FLEX = None
-        self.FLEX2 = None
-        self.FLEX3 = None
+        self.QBs = []
+        self.RBs = []
+        self.WRs = []
+        self.TEs = []
 
     def __str__(self):
         roster_str = f"Roster Points: {self.total_points}\n"
-        roster_str += f"QB: {self.QB.name if self.QB else 'None'} {self.QB.round if self.QB else 'None'}\n"
-        roster_str += f"RB1: {self.RB1.name if self.RB1 else 'None'} {self.RB1.round if self.RB1 else 'None'}\n"
-        roster_str += f"RB2: {self.RB2.name if self.RB2 else 'None'} {self.RB2.round if self.RB2 else 'None'}\n"
-        roster_str += f"WR1: {self.WR1.name if self.WR1 else 'None'} {self.WR1.round if self.WR1 else 'None'}\n"
-        roster_str += f"WR2: {self.WR2.name if self.WR2 else 'None'} {self.WR2.round if self.WR2 else 'None'}\n"
-        roster_str += f"TE: {self.TE.name if self.TE else 'None'} {self.TE.round if self.TE else 'None'}\n"
-        roster_str += f"FLEX: {self.FLEX.name if self.FLEX else 'None'} {self.FLEX.round if self.FLEX else 'None'}\n"
-        roster_str += f"FLEX2: {self.FLEX2.name if self.FLEX2 else 'None'} {self.FLEX2.round if self.FLEX2 else 'None'}\n"
-        roster_str += f"FLEX3: {self.FLEX3.name if self.FLEX3 else 'None'} {self.FLEX3.round if self.FLEX3 else 'None'}\n"
+        roster_str += f"QBs: {self.get_QB()}\n"
+        roster_str += f"RBs: {self.get_RB()}\n"
+        roster_str += f"WRs: {self.get_WR()}\n"
+        roster_str += f"TEs: {self.get_TE()}\n"
         return roster_str
 
     def add_player(self, player: Player):
-        if player.pos == 'QB' and self.QB is None:
-            self.QB = player
-        elif player.pos == 'RB':
-            if self.RB1 is None:
-                self.RB1 = player
-            elif self.RB2 is None:
-                self.RB2 = player
-            elif self.FLEX is None:
-                self.FLEX = player
-            elif self.FLEX2 is None:
-                self.FLEX2 = player
-                self.total_points -= player.points * 0.5
-            elif self.FLEX3 is None:
-                self.FLEX3 = player
-                self.total_points -= player.points * 0.5
+        if player.pos == 'QB':
+            self.QBs.append(player)
         elif player.pos == 'WR':
-            if self.WR1 is None:
-                self.WR1 = player
-            elif self.WR2 is None:
-                self.WR2 = player
-            elif self.FLEX is None:
-                self.FLEX = player
-            elif self.FLEX2 is None:
-                self.FLEX2 = player
-                self.total_points -= player.points * 0.5
-            elif self.FLEX3 is None:
-                self.FLEX3 = player
-                self.total_points -= player.points * 0.5
+            self.WRs.append(player)
+        elif player.pos == 'RB':
+            self.RBs.append(player)
         elif player.pos == 'TE':
-            if self.TE is None:
-                self.TE = player
-            elif self.FLEX is None:
-                self.FLEX = player
-            elif self.FLEX2 is None:
-                self.FLEX2 = player
-                self.total_points -= player.points * 0.5
-            elif self.FLEX3 is None:
-                self.FLEX3 = player
-                self.total_points -= player.points * 0.5
+            self.TEs.append(player)
         self.total_points += player.points
 
     def can_draft_QB(self):
-        return self.QB is None
+        return len(self.QBs) == 0
   
     def can_draft_RB(self):
-        return self.RB1 is None or self.RB2 is None or self.FLEX is None or self.FLEX2 is None or self.FLEX3 is None
+        return len(self.RBs) < 2
 
     def can_draft_WR(self):
-        return self.WR1 is None or self.WR2 is None or self.FLEX is None or self.FLEX2 is None or self.FLEX3 is None
+        return len(self.WRs) < 3
 
     def can_draft_TE(self):
-        return self.TE or self.FLEX is None or self.FLEX2 is None or self.FLEX3 is None
+        return len(self.TEs) == 0
 
     def get_QB(self):
         qbs = []
-        if self.QB:
-            qbs.append(self.QB.name)
+        for qb in self.QBs:
+            qbs.append(qb.name)
         return qbs
   
     def get_RB(self):
         rbs = []
-        if self.RB1:
-            rbs.append(self.RB1.name)
-        if self.RB2:
-            rbs.append(self.RB2.name)
-        if self.FLEX and self.FLEX.pos == 'RB':
-            rbs.append(self.FLEX.name)
-        if self.FLEX2 and self.FLEX2.pos == 'RB':
-            rbs.append(self.FLEX2.name)
-        if self.FLEX3 and self.FLEX3.pos == 'TE':
-            rbs.append(self.FLEX3.name)
+        for rb in self.RBs:
+            rbs.append(rb.name)
         return rbs
 
     def get_WR(self):
         wrs = []
-        if self.WR1:
-            wrs.append(self.WR1.name)
-        if self.WR2:
-            wrs.append(self.WR2.name)
-        if self.FLEX and self.FLEX.pos == 'WR':
-            wrs.append(self.FLEX.name)
-        if self.FLEX2 and self.FLEX2.pos == 'WR':
-            wrs.append(self.FLEX2.name)
-        if self.FLEX3 and self.FLEX3.pos == 'TE':
-            wrs.append(self.FLEX3.name)
+        for wr in self.WRs:
+            wrs.append(wr.name)
         return wrs
 
     def get_TE(self):
         tes = []
-        if self.TE:
-            tes.append(self.TE.name)
-        if self.FLEX and self.FLEX.pos == 'TE':
-            tes.append(self.FLEX.name)
-        if self.FLEX2 and self.FLEX2.pos == 'TE':
-            tes.append(self.FLEX2.name)
-        if self.FLEX3 and self.FLEX3.pos == 'TE':
-            tes.append(self.FLEX3.name)
-        
+        for te in self.TEs:
+            tes.append(te.name)
         return tes
 
     def remove_player(self, player: Player):
-        if player.pos == 'QB' and self.QB == player:
-            self.total_points -= player.points
-            self.QB = None
+        if player.pos == 'QB':
+            for i in range(len(self.QBs)):
+                if self.QBs[i].name == player.name:
+                    self.total_points -= player.points
+                    self.QBs.pop(i)
         elif player.pos == 'RB':
-            if self.RB1 == player:
-                self.total_points -= player.points
-                self.RB1 = None
-            elif self.RB2 == player:
-                self.total_points -= player.points
-                self.RB2 = None
-            elif self.FLEX == player:
-                self.total_points -= player.points
-                self.FLEX = None
-            elif self.FLEX2 == player:
-                self.total_points -= player.points * 0.5
-                self.FLEX2 = None
-            elif self.FLEX3 == player:
-                self.total_points -= player.points * 0.5
-                self.FLEX3 = None
+            for i in range(len(self.RBs)):
+                if self.RBs[i].name == player.name:
+                    self.total_points -= player.points
+                    self.RBs.pop(i)
         elif player.pos == 'WR':
-            if self.WR1 == player:
-                self.total_points -= player.points
-                self.WR1 = None
-            elif self.WR2 == player:
-                self.total_points -= player.points
-                self.WR2 = None
-            elif self.FLEX == player:
-                self.total_points -= player.points
-                self.FLEX = None
-            elif self.FLEX2 == player:
-                self.total_points -= player.points * 0.5
-                self.FLEX2 = None
-            elif self.FLEX3 == player:
-                self.total_points -= player.points * 0.5
-                self.FLEX3 = None
+            for i in range(len(self.RBs)):
+                if self.RBs[i].name == player.name:
+                    self.total_points -= player.points
+                    self.RBs.pop(i)
         elif player.pos == 'TE':
-            if self.TE == player:
-                self.total_points -= player.points
-                self.TE = None
-            elif self.FLEX == player:
-                self.total_points -= player.points
-                self.FLEX = None
-            elif self.FLEX2 == player:
-                self.total_points -= player.points * 0.5
-                self.FLEX2 = None
-            elif self.FLEX3 == player:
-                self.total_points -= player.points * 0.5
-                self.FLEX3 = None
+            for i in range(len(self.TEs)):
+                if self.TEs[i].name == player.name:
+                    self.total_points -= player.points
+                    self.TEs.pop(i)
