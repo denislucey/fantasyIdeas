@@ -18,34 +18,57 @@ class Roster:
 
     def __str__(self):
         roster_str = f"Roster Points: {self.total_points}\n"
-        roster_str += f"QBs: {self.get_QB()}\n"
-        roster_str += f"RBs: {self.get_RB()}\n"
-        roster_str += f"WRs: {self.get_WR()}\n"
-        roster_str += f"TEs: {self.get_TE()}\n"
+        roster_str += f"QBs: {self.print_pos_data('QB')}\n"
+        roster_str += f"RBs: {self.print_pos_data('RB')}\n"
+        roster_str += f"WRs: {self.print_pos_data('WR')}\n"
+        roster_str += f"TEs: {self.print_pos_data('TE')}\n"
         return roster_str
+    
+    def print_pos_data(self,pos: str):
+        new_list = {}
+        player_list = []
+        if pos == 'QB':
+            player_list = self.QBs
+        elif pos == 'RB':
+            player_list = self.RBs
+        elif pos == 'WR':
+            player_list = self.WRs
+        elif pos == 'TE':
+            player_list = self.TEs
+
+        for player in player_list:
+            new_list[player.name] = [player.points,player.round]
+        return new_list
 
     def add_player(self, player: Player):
         if player.pos == 'QB':
             self.QBs.append(player)
+            if len(self.QBs) <= 1:
+                self.total_points += player.points
         elif player.pos == 'WR':
             self.WRs.append(player)
+            if len(self.WRs) <= 3:
+                self.total_points += player.points
         elif player.pos == 'RB':
             self.RBs.append(player)
+            if len(self.RBs) <= 2:
+                self.total_points += player.points
         elif player.pos == 'TE':
             self.TEs.append(player)
-        self.total_points += player.points
+            if len(self.TEs) <= 2:
+                self.total_points += player.points
 
     def can_draft_QB(self):
-        return len(self.QBs) == 0
+        return len(self.QBs) < 2
   
     def can_draft_RB(self):
-        return len(self.RBs) < 2
+        return len(self.RBs) < 7
 
     def can_draft_WR(self):
-        return len(self.WRs) < 3
+        return len(self.WRs) < 7
 
     def can_draft_TE(self):
-        return len(self.TEs) == 0
+        return len(self.TEs) < 2
 
     def get_QB(self):
         qbs = []

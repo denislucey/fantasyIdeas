@@ -7,7 +7,7 @@ import pandas as pd
 import os
 import time
 
-def sleeper_api_call(draft_id: str, picks):
+def sleeper_api_call(draft_id: str):
     draft_results = Drafts.get_all_picks_in_draft(draft_id)
     # return draft_results
 
@@ -25,11 +25,14 @@ def sleeper_draft_buddy(draft_id: str, spot: int, thr_rr: bool):
     picks = get_picks(spot,thr_rr)
 
     # call api to get drafted players
-    taken_players = sleeper_api_call(draft_id,picks)
+    taken_players = sleeper_api_call(draft_id)
 
     #import players
-    players = pd.read_csv(os.path.dirname(os.path.realpath(__file__)) + '\\players_with_adp.csv')
-    filtered_players = players[['Name', 'Points', 'Position','ADP']].fillna(500)
+    players = pd.read_csv(os.path.dirname(os.path.realpath(__file__)) + '\\sheet_7_13.csv')
+
+    filtered_players = players[['Player', 'Proj Points', 'Position','Sleeper ADP']].fillna(500)
+    filtered_players.columns = ['Name', 'Points', 'Position', 'ADP']
+    # filtered_players = players[['Name', 'Points', 'Position','ADP']].fillna(500)
 
     # get players you have drafted
     my_players = []
@@ -54,9 +57,20 @@ def sleeper_draft_buddy(draft_id: str, spot: int, thr_rr: bool):
 
 
 
+def print_bpa(pos: str, draft_id: str, amt: int):
+    taken_players = sleeper_api_call(draft_id)
+    players = pd.read_csv(os.path.dirname(os.path.realpath(__file__)) + '\\sheet_7_13.csv')
+
+    filtered_players = players[['Player', 'Proj Points', 'Position','Sleeper ADP']].fillna(500)
+    filtered_players.columns = ['Name', 'Points', 'Position', 'ADP']
+    remaining_players = filtered_players[~filtered_players['Name'].isin(taken_players)]
+    print(remaining_players[remaining_players['Position'] == pos].sort_values(by='Points', ascending=False).head(amt))
+    return
+
 def main():
     start_time = time.time()
-    sleeper_draft_buddy('1249569429679775744',5,False)
+    sleeper_draft_buddy('1250314895363162112',4,False)
     print(f"Exectution Time: {time.time() - start_time}")
 
 main()
+print_bpa('TE','1250314895363162112',5)
