@@ -1,3 +1,16 @@
+import pandas as pd
+import os
+
+all_players = pd.read_csv(os.path.dirname(os.path.realpath(__file__)) + '\\sheet_7_13.csv')
+
+RB_worst_starter = all_players[all_players['Position'] == 'RB'].sort_values(by='Proj Points', ascending=False).iloc[31]['Proj Points']
+QB_worst_starter = all_players[all_players['Position'] == 'QB'].sort_values(by='Proj Points', ascending=False).iloc[15]['Proj Points']
+WR_worst_starter = all_players[all_players['Position'] == 'WR'].sort_values(by='Proj Points', ascending=False).iloc[47]['Proj Points']
+TE_worst_starter = all_players[all_players['Position'] == 'TE'].sort_values(by='Proj Points', ascending=False).iloc[15]['Proj Points']
+
+
+
+
 class Player:
     """Represents a player"""
     def __init__(self, name: str, pos: str, points: float, pick: int):
@@ -11,6 +24,7 @@ class Roster:
     """Represents a team"""
     def __init__(self):
         self.total_points = 0
+        self.total_PAWS = 0
         self.QBs = []
         self.RBs = []
         self.WRs = []
@@ -18,6 +32,7 @@ class Roster:
 
     def __str__(self):
         roster_str = f"Roster Points: {self.total_points}\n"
+        roster_str += f"PAWS: {self.total_PAWS}\n"
         roster_str += f"QBs: {self.print_pos_data('QB')}\n"
         roster_str += f"RBs: {self.print_pos_data('RB')}\n"
         roster_str += f"WRs: {self.print_pos_data('WR')}\n"
@@ -43,18 +58,22 @@ class Roster:
     def add_player(self, player: Player):
         if player.pos == 'QB':
             self.QBs.append(player)
+            self.total_PAWS += (player.points - QB_worst_starter)
             if len(self.QBs) <= 1:
                 self.total_points += player.points
         elif player.pos == 'WR':
             self.WRs.append(player)
+            self.total_PAWS += (player.points - WR_worst_starter)
             if len(self.WRs) <= 3:
                 self.total_points += player.points
         elif player.pos == 'RB':
             self.RBs.append(player)
+            self.total_PAWS += (player.points - RB_worst_starter)
             if len(self.RBs) <= 2:
                 self.total_points += player.points
         elif player.pos == 'TE':
             self.TEs.append(player)
+            self.total_PAWS += (player.points - TE_worst_starter)
             if len(self.TEs) <= 2:
                 self.total_points += player.points
 
@@ -62,10 +81,10 @@ class Roster:
         return len(self.QBs) < 2
   
     def can_draft_RB(self):
-        return len(self.RBs) < 7
+        return len(self.RBs) < 5
 
     def can_draft_WR(self):
-        return len(self.WRs) < 7
+        return len(self.WRs) < 5
 
     def can_draft_TE(self):
         return len(self.TEs) < 2
@@ -98,20 +117,24 @@ class Roster:
         if player.pos == 'QB':
             for i in range(len(self.QBs)):
                 if self.QBs[i].name == player.name:
+                    self.total_PAWS -= (player.points - QB_worst_starter)
                     self.total_points -= player.points
                     self.QBs.pop(i)
         elif player.pos == 'RB':
             for i in range(len(self.RBs)):
                 if self.RBs[i].name == player.name:
+                    self.total_PAWS += (player.points - RB_worst_starter)
                     self.total_points -= player.points
                     self.RBs.pop(i)
         elif player.pos == 'WR':
-            for i in range(len(self.RBs)):
-                if self.RBs[i].name == player.name:
+            for i in range(len(self.WRs)):
+                if self.WRs[i].name == player.name:
+                    self.total_PAWS += (player.points - WR_worst_starter)
                     self.total_points -= player.points
-                    self.RBs.pop(i)
+                    self.WRs.pop(i)
         elif player.pos == 'TE':
             for i in range(len(self.TEs)):
                 if self.TEs[i].name == player.name:
+                    self.total_PAWS += (player.points - TE_worst_starter)
                     self.total_points -= player.points
                     self.TEs.pop(i)

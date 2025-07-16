@@ -61,16 +61,19 @@ def print_bpa(pos: str, draft_id: str, amt: int):
     taken_players = sleeper_api_call(draft_id)
     players = pd.read_csv(os.path.dirname(os.path.realpath(__file__)) + '\\sheet_7_13.csv')
 
-    filtered_players = players[['Player', 'Proj Points', 'Position','Sleeper ADP']].fillna(500)
-    filtered_players.columns = ['Name', 'Points', 'Position', 'ADP']
+    filtered_players = players[['Player', 'Proj Points', 'Position','Sleeper ADP','PARL']].fillna(500)
+    filtered_players.columns = ['Name', 'Points', 'Position', 'ADP','PARL']
     remaining_players = filtered_players[~filtered_players['Name'].isin(taken_players)]
     print(remaining_players[remaining_players['Position'] == pos].sort_values(by='Points', ascending=False).head(amt))
     return
 
 def main():
     start_time = time.time()
-    sleeper_draft_buddy('1250314895363162112',4,False)
+    sleeper_draft_buddy('1251017401995112448',7,False)
     print(f"Exectution Time: {time.time() - start_time}")
 
-main()
-print_bpa('TE','1250314895363162112',5)
+# main()
+# print_bpa('WR','1251017401995112448',3)
+# print_bpa('RB','1251017401995112448',3)
+print_bpa('TE','1251017401995112448',3)
+print_bpa('QB','1251017401995112448',3)

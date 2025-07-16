@@ -14,6 +14,8 @@ def draft_buddy_wrapper(pick: int, thr_rr: bool = False):
     
     return draft_buddy(draft_picks,1,filtered_players,roster=Roster())
 
+
+#Very first attempt, basic
 def draft_buddy(picks, pick_round: int, player_df: pd.DataFrame, roster: Roster):
     
     if pick_round > 7:
@@ -59,8 +61,7 @@ def draft_buddy(picks, pick_round: int, player_df: pd.DataFrame, roster: Roster)
 
     # return the roster with the highest points
     rosters = [draft_QB_roster, draft_RB_roster, draft_WR_roster, draft_TE_roster]
-    best_roster = max(rosters, key=lambda r: r.total_points)
-    return best_roster
+    return get_best_roster(rosters)
 
 
 # Called when you are on the clock, assumes you can draft any available player
@@ -135,10 +136,7 @@ def draft_buddy_selective(picks,pick_round,player_df,roster):
         #     draft_last_chance_TE_roster.add_player(best_TE)
         #     draft_last_chance_TE_roster = draft_buddy_abstract(picks,pick_round+1,player_df,draft_last_chance_TE_roster)
         #     branches.append(draft_last_chance_TE_roster)
-
-    # return the roster with the highest points
-    best_roster = max(branches, key=lambda r: r.total_points)
-    return best_roster
+    return get_best_roster(branches)
 
 def calculate_est_val(available_players,cur_pick):
     proj_points = 0
@@ -209,8 +207,10 @@ def draft_buddy_abstract(picks,pick_round,player_df,roster):
 
     # return the roster with the highest points
     rosters = [draft_QB_roster, draft_RB_roster, draft_WR_roster, draft_TE_roster]
-    best_roster = max(rosters, key=lambda r: r.total_points)
-    return best_roster
+    return get_best_roster(rosters)
+
+def get_best_roster(rosters):
+    return max(rosters, key=lambda r: r.total_PAWS)
 
 def main():
     for i in range(1,17):
