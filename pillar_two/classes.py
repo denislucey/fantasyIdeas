@@ -81,10 +81,10 @@ class Roster:
         return len(self.QBs) < 2
   
     def can_draft_RB(self):
-        return len(self.RBs) < 5
+        return len(self.RBs) < 6
 
     def can_draft_WR(self):
-        return len(self.WRs) < 5
+        return len(self.WRs) < 6
 
     def can_draft_TE(self):
         return len(self.TEs) < 2

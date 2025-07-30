@@ -170,11 +170,11 @@ def draft_buddy_abstract(picks,pick_round,player_df,roster):
     if roster.can_draft_QB():
         best_available_QBs = player_df[(player_df['Position'] == 'QB') & (player_df['ADP'] >= cur_pick*.7) & ~player_df['Name'].isin(roster.get_QB())].sort_values(by='Points', ascending=False)
         key = "QB" + str(cur_pick)
-        if key in player_map:
-            QB_name,best_QB = player_map[key]
+        if key in player_map and (player_map[key][0] not in roster.get_QB()):
+            [QB_name,best_QB] = player_map[key]
         else:
             QB_name,best_QB = calculate_est_val(best_available_QBs,cur_pick)
-            # player_map[key] = (QB_name,best_QB)
+            # player_map[key] = [QB_name,best_QB]
         best_QB = Player(name=QB_name, pos='QB', points=best_QB, pick=cur_pick)
         draft_QB_roster = copy.deepcopy(roster)
         draft_QB_roster.add_player(best_QB)
