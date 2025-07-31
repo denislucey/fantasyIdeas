@@ -24,6 +24,7 @@ class Roster:
     """Represents a team"""
     def __init__(self):
         self.total_points = 0
+        self.starters = []
         self.total_PAWS = 0
         self.QBs = []
         self.RBs = []
@@ -61,30 +62,34 @@ class Roster:
             self.total_PAWS += (player.points - QB_worst_starter)
             if len(self.QBs) <= 1:
                 self.total_points += player.points
+                self.starters.append(player.name)
         elif player.pos == 'WR':
             self.WRs.append(player)
             self.total_PAWS += (player.points - WR_worst_starter)
             if len(self.WRs) <= 3:
                 self.total_points += player.points
+                self.starters.append(player.name)
         elif player.pos == 'RB':
             self.RBs.append(player)
             self.total_PAWS += (player.points - RB_worst_starter)
             if len(self.RBs) <= 2:
-                self.total_points += player.points
+                self.total_points += player.points  
+                self.starters.append(player.name)
         elif player.pos == 'TE':
             self.TEs.append(player)
             self.total_PAWS += (player.points - TE_worst_starter)
-            if len(self.TEs) <= 2:
+            if len(self.TEs) <= 1:
                 self.total_points += player.points
+                self.starters.append(player.name)
 
     def can_draft_QB(self):
         return len(self.QBs) < 2
   
     def can_draft_RB(self):
-        return len(self.RBs) < 6
+        return len(self.RBs) < 10
 
     def can_draft_WR(self):
-        return len(self.WRs) < 6
+        return len(self.WRs) < 10
 
     def can_draft_TE(self):
         return len(self.TEs) < 2
@@ -118,7 +123,6 @@ class Roster:
             for i in range(len(self.QBs)):
                 if self.QBs[i].name == player.name:
                     self.total_PAWS -= (player.points - QB_worst_starter)
-                    self.total_points -= player.points
                     self.QBs.pop(i)
         elif player.pos == 'RB':
             for i in range(len(self.RBs)):
@@ -138,3 +142,7 @@ class Roster:
                     self.total_PAWS += (player.points - TE_worst_starter)
                     self.total_points -= player.points
                     self.TEs.pop(i)
+        
+        if player.name in self.starters:
+            self.total_points -= player.points
+            self.starters.remove(player.name)

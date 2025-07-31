@@ -69,7 +69,7 @@ def print_bpa(pos: str, draft_id: str, amt: int):
 
 def main():
     start_time = time.time()
-    sleeper_draft_buddy('1256638546458968064',14,True,0)
+    sleeper_draft_buddy('1256707916308692992',10,True,0)
     print(f"Exectution Time: {time.time() - start_time}")
 
 main()

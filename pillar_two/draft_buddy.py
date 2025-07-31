@@ -5,6 +5,8 @@ from draft_picks import get_picks
 from classes import Roster, Player
 from scipy.stats import norm
 
+MAX_DEPTH = 7
+
 def draft_buddy_wrapper(pick: int, thr_rr: bool = False):
     #create the data frame
     draft_picks = get_picks(pick,thr_rr)
@@ -66,7 +68,7 @@ def draft_buddy(picks, pick_round: int, player_df: pd.DataFrame, roster: Roster)
 
 # Called when you are on the clock, assumes you can draft any available player
 def draft_buddy_selective(picks,pick_round,player_df,roster,depth):
-    if pick_round > 10:
+    if pick_round > len(picks)-1:
         return roster
     
     cur_pick = picks[pick_round-1]
@@ -162,7 +164,7 @@ player_map = {}
 
 def draft_buddy_abstract(picks,pick_round,player_df,roster,depth):
     
-    if depth > 6 or pick_round > 10:
+    if depth > MAX_DEPTH or pick_round > len(picks):
         return roster
     
     branches = []
@@ -227,7 +229,7 @@ def draft_buddy_abstract(picks,pick_round,player_df,roster,depth):
     return get_best_roster(branches)
 
 def get_best_roster(rosters):
-    return max(rosters, key=lambda r: r.total_PAWS)
+    return max(rosters, key=lambda r: r.total_points + r.total_PAWS)
 
 def main():
     for i in range(1,17):
