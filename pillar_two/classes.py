@@ -72,8 +72,8 @@ class Roster:
         elif player.pos == 'RB':
             self.RBs.append(player)
             self.total_PAWS += (player.points - RB_worst_starter)
-            if len(self.RBs) <= 2:
-                self.total_points += player.points  
+            if len(self.RBs) <= 3:
+                self.total_points += player.points
                 self.starters.append(player.name)
         elif player.pos == 'TE':
             self.TEs.append(player)

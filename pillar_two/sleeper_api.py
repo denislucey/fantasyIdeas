@@ -51,7 +51,7 @@ def sleeper_draft_buddy(draft_id: str, spot: int, thr_rr: bool,depth: int):
 
     remaining_players = filtered_players[~filtered_players['Name'].isin(taken_players)]
 
-    best_roster = draft_buddy_selective(picks,len(my_players)+1,remaining_players,my_roster,depth)
+    best_roster = draft_buddy_selective(picks,len(my_players)+1,remaining_players,my_roster,depth,True)
     print(best_roster)
     # call draft buddy
 
@@ -67,9 +67,12 @@ def print_bpa(pos: str, draft_id: str, amt: int):
     print(remaining_players[remaining_players['Position'] == pos].sort_values(by='Points', ascending=False).head(amt))
     return
 
+
+DRAFT_ID = '1256728052457553920'
+
 def main():
     start_time = time.time()
-    sleeper_draft_buddy('1256707916308692992',10,True,0)
+    sleeper_draft_buddy(DRAFT_ID,7,True,0)
     print(f"Exectution Time: {time.time() - start_time}")
 
 main()
