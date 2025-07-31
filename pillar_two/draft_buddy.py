@@ -65,8 +65,8 @@ def draft_buddy(picks, pick_round: int, player_df: pd.DataFrame, roster: Roster)
 
 
 # Called when you are on the clock, assumes you can draft any available player
-def draft_buddy_selective(picks,pick_round,player_df,roster):
-    if pick_round > 7:
+def draft_buddy_selective(picks,pick_round,player_df,roster,depth):
+    if pick_round > 10:
         return roster
     
     cur_pick = picks[pick_round-1]
@@ -78,7 +78,7 @@ def draft_buddy_selective(picks,pick_round,player_df,roster):
         best_QB = Player(name=best_QB['Name'], pos=best_QB['Position'], points=best_QB['Points'], pick=cur_pick)
         draft_QB_roster = copy.deepcopy(roster)
         draft_QB_roster.add_player(best_QB)
-        draft_QB_roster = draft_buddy_abstract(picks,pick_round+1,player_df,draft_QB_roster)
+        draft_QB_roster = draft_buddy_abstract(picks,pick_round+1,player_df,draft_QB_roster,depth + 1)
         branches.append(draft_QB_roster)
 
         # best_last_chance_QB = player_df[(player_df['Position'] == 'QB') & ~player_df['Name'].isin(roster.get_QB()) & (player_df['ADP'] <= picks[pick_round])].sort_values(by='Points', ascending=False).iloc[0]
@@ -94,7 +94,7 @@ def draft_buddy_selective(picks,pick_round,player_df,roster):
         best_RB = Player(name=best_RB['Name'], pos=best_RB['Position'], points=best_RB['Points'], pick=cur_pick)
         draft_RB_roster = copy.deepcopy(roster)
         draft_RB_roster.add_player(best_RB)
-        draft_RB_roster = draft_buddy_abstract(picks,pick_round+1,player_df,draft_RB_roster)
+        draft_RB_roster = draft_buddy_abstract(picks,pick_round+1,player_df,draft_RB_roster,depth + 1)
         branches.append(draft_RB_roster)
 
         # best_last_chance_RB = player_df[(player_df['Position'] == 'RB') & ~player_df['Name'].isin(roster.get_RB()) & (player_df['ADP'] <= picks[pick_round])].sort_values(by='Points', ascending=False).iloc[0]
@@ -110,7 +110,7 @@ def draft_buddy_selective(picks,pick_round,player_df,roster):
         best_WR = Player(name=best_WR['Name'], pos=best_WR['Position'], points=best_WR['Points'], pick=cur_pick)
         draft_WR_roster = copy.deepcopy(roster)
         draft_WR_roster.add_player(best_WR)
-        draft_WR_roster = draft_buddy_abstract(picks,pick_round+1,player_df,draft_WR_roster)
+        draft_WR_roster = draft_buddy_abstract(picks,pick_round+1,player_df,draft_WR_roster, depth + 1)
         branches.append(draft_WR_roster)
 
         # best_last_chance_WR = player_df[(player_df['Position'] == 'WR') & ~player_df['Name'].isin(roster.get_WR()) & (player_df['ADP'] <= picks[pick_round])].sort_values(by='Points', ascending=False).iloc[0]
@@ -126,7 +126,7 @@ def draft_buddy_selective(picks,pick_round,player_df,roster):
         best_TE = Player(name=best_TE['Name'], pos=best_TE['Position'], points=best_TE['Points'], pick=cur_pick)
         draft_TE_roster = copy.deepcopy(roster)
         draft_TE_roster.add_player(best_TE)
-        draft_TE_roster = draft_buddy_abstract(picks,pick_round+1,player_df,draft_TE_roster)
+        draft_TE_roster = draft_buddy_abstract(picks,pick_round+1,player_df,draft_TE_roster,depth + 1)
         branches.append(draft_TE_roster)
 
         # best_last_chance_TE = player_df[(player_df['Position'] == 'TE') & ~player_df['Name'].isin(roster.get_TE()) & (player_df['ADP'] <= picks[pick_round])].sort_values(by='Points', ascending=False).iloc[0]
@@ -160,11 +160,12 @@ def calculate_est_val(available_players,cur_pick):
 
 player_map = {}
 
-def draft_buddy_abstract(picks,pick_round,player_df,roster):
+def draft_buddy_abstract(picks,pick_round,player_df,roster,depth):
     
-    if pick_round > 7:
+    if depth > 6 or pick_round > 10:
         return roster
     
+    branches = []
     cur_pick = picks[pick_round-1]
     # Need to figure this out
     if roster.can_draft_QB():
@@ -178,9 +179,8 @@ def draft_buddy_abstract(picks,pick_round,player_df,roster):
         best_QB = Player(name=QB_name, pos='QB', points=best_QB, pick=cur_pick)
         draft_QB_roster = copy.deepcopy(roster)
         draft_QB_roster.add_player(best_QB)
-        draft_QB_roster = draft_buddy_abstract(picks,pick_round+1,player_df,draft_QB_roster)
-    else:
-        draft_QB_roster = roster
+        draft_QB_roster = draft_buddy_abstract(picks,pick_round+1,player_df,draft_QB_roster,depth+1)
+        branches.append(draft_QB_roster)
     
     if roster.can_draft_RB():
         best_available_RBs = player_df[(player_df['Position'] == 'RB') & (player_df['ADP'] >= cur_pick*.7) & ~player_df['Name'].isin(roster.get_RB())].sort_values(by='Points', ascending=False)
@@ -193,9 +193,8 @@ def draft_buddy_abstract(picks,pick_round,player_df,roster):
             # player_map[key] = best_RB
         draft_RB_roster = copy.deepcopy(roster)
         draft_RB_roster.add_player(best_RB)
-        draft_RB_roster = draft_buddy_abstract(picks,pick_round+1,player_df,draft_RB_roster)
-    else:
-        draft_RB_roster = roster
+        draft_RB_roster = draft_buddy_abstract(picks,pick_round+1,player_df,draft_RB_roster,depth+1)
+        branches.append(draft_RB_roster)
     
     if roster.can_draft_WR():
         best_available_WRs = player_df[(player_df['Position'] == 'WR') & (player_df['ADP'] >= cur_pick*.7) & ~player_df['Name'].isin(roster.get_WR())].sort_values(by='Points', ascending=False)
@@ -208,9 +207,8 @@ def draft_buddy_abstract(picks,pick_round,player_df,roster):
         best_WR = Player(name=WR_name, pos='WR', points=best_WR, pick=cur_pick)
         draft_WR_roster = copy.deepcopy(roster)
         draft_WR_roster.add_player(best_WR)
-        draft_WR_roster = draft_buddy_abstract(picks,pick_round+1,player_df,draft_WR_roster)
-    else:
-        draft_WR_roster = roster
+        draft_WR_roster = draft_buddy_abstract(picks,pick_round+1,player_df,draft_WR_roster,depth+1)
+        branches.append(draft_WR_roster)
 
     if roster.can_draft_TE():
         best_available_TEs = player_df[(player_df['Position'] == 'TE') & (player_df['ADP'] >= cur_pick*.7) & ~player_df['Name'].isin(roster.get_TE())].sort_values(by='Points', ascending=False)
@@ -223,13 +221,10 @@ def draft_buddy_abstract(picks,pick_round,player_df,roster):
         best_TE = Player(name=TE_name, pos='TE', points=best_TE, pick=cur_pick)
         draft_TE_roster = copy.deepcopy(roster)
         draft_TE_roster.add_player(best_TE)
-        draft_TE_roster = draft_buddy_abstract(picks,pick_round+1,player_df,draft_TE_roster)
-    else:
-        draft_TE_roster = roster
+        draft_TE_roster = draft_buddy_abstract(picks,pick_round+1,player_df,draft_TE_roster,depth+1)
+        branches.append(draft_TE_roster)
 
-    # return the roster with the highest points
-    rosters = [draft_QB_roster, draft_RB_roster, draft_WR_roster, draft_TE_roster]
-    return get_best_roster(rosters)
+    return get_best_roster(branches)
 
 def get_best_roster(rosters):
     return max(rosters, key=lambda r: r.total_PAWS)

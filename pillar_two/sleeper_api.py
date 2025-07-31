@@ -20,7 +20,7 @@ def sleeper_api_call(draft_id: str):
         
 
 # Only use if you are on the clock
-def sleeper_draft_buddy(draft_id: str, spot: int, thr_rr: bool):
+def sleeper_draft_buddy(draft_id: str, spot: int, thr_rr: bool,depth: int):
     # get picks
     picks = get_picks(spot,thr_rr)
 
@@ -51,7 +51,7 @@ def sleeper_draft_buddy(draft_id: str, spot: int, thr_rr: bool):
 
     remaining_players = filtered_players[~filtered_players['Name'].isin(taken_players)]
 
-    best_roster = draft_buddy_selective(picks,len(my_players)+1,remaining_players,my_roster)
+    best_roster = draft_buddy_selective(picks,len(my_players)+1,remaining_players,my_roster,depth)
     print(best_roster)
     # call draft buddy
 
@@ -69,7 +69,7 @@ def print_bpa(pos: str, draft_id: str, amt: int):
 
 def main():
     start_time = time.time()
-    sleeper_draft_buddy('1256366810295439360',13,False)
+    sleeper_draft_buddy('1256634320932589568',13,False,0)
     print(f"Exectution Time: {time.time() - start_time}")
 
 main()
