@@ -1,5 +1,5 @@
 
-three_rr = {
+three_rr_sixteen = {
     1: [1, 32, 48, 49, 80, 81, 112, 113, 144, 145,176,177],
     2: [2, 31, 47, 50, 79, 82, 111, 114, 143, 146,175,178],
     3: [3, 30, 46, 51, 78, 83, 110, 115, 142, 147,174,179],
@@ -18,7 +18,7 @@ three_rr = {
     16: [16, 17, 33, 64, 65, 96, 97, 128, 129, 160,161,192]
 }
 
-no_three_rr = {
+no_three_rr_sixteen = {
     1: [1, 32, 33, 64, 65, 96, 97, 128, 129,160],
     2: [2, 31, 34, 63, 66, 95, 98, 127, 130,159],
     3: [3, 30, 35, 62, 67, 94, 99, 126, 131,158],
@@ -39,8 +39,8 @@ no_three_rr = {
 
 def get_picks(spot: int, thr_rr: bool):
     if thr_rr:
-        draft_picks = three_rr[spot]
+        draft_picks = three_rr_sixteen[spot]
     else:
-        draft_picks = no_three_rr[spot]
+        draft_picks = no_three_rr_sixteen[spot]
 
     return draft_picks

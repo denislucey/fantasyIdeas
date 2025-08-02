@@ -5,7 +5,8 @@ from draft_picks import get_picks
 from classes import Roster, Player
 from scipy.stats import norm
 
-MAX_DEPTH = 7
+MAX_DEPTH = 8
+# FN_CALLS = 0
 
 def draft_buddy_wrapper(pick: int, thr_rr: bool = False):
     #create the data frame
@@ -75,45 +76,32 @@ def draft_buddy_selective(picks,pick_round,player_df,roster,depth,verbose):
 
     branches = []
 
-    if roster.can_draft_QB():
-        best_QB = player_df[(player_df['Position'] == 'QB') & ~player_df['Name'].isin(roster.get_QB())].sort_values(by='Points', ascending=False).iloc[0]
-        best_QB = Player(name=best_QB['Name'], pos=best_QB['Position'], points=best_QB['Points'], pick=cur_pick)
-        draft_QB_roster = copy.deepcopy(roster)
-        draft_QB_roster.add_player(best_QB)
-        draft_QB_roster = draft_buddy_abstract(picks,pick_round+1,player_df,draft_QB_roster,depth + 1)
-        if verbose: print(f"{best_QB.name} is {draft_QB_roster.total_points}")
-        branches.append(draft_QB_roster)
-   
-    if roster.can_draft_RB():
-        best_RB = player_df[(player_df['Position'] == 'RB') & ~player_df['Name'].isin(roster.get_RB())].sort_values(by='Points', ascending=False).iloc[0]
-        best_RB = Player(name=best_RB['Name'], pos=best_RB['Position'], points=best_RB['Points'], pick=cur_pick)
-        draft_RB_roster = copy.deepcopy(roster)
-        draft_RB_roster.add_player(best_RB)
-        draft_RB_roster = draft_buddy_abstract(picks,pick_round+1,player_df,draft_RB_roster,depth + 1)
-        if verbose: print(f"{best_RB.name} is {draft_RB_roster.total_points}")
-        branches.append(draft_RB_roster)
-    
-    if roster.can_draft_WR():
-        best_WR = player_df[(player_df['Position'] == 'WR') & ~player_df['Name'].isin(roster.get_WR())].sort_values(by='Points', ascending=False).iloc[0]
-        best_WR = Player(name=best_WR['Name'], pos=best_WR['Position'], points=best_WR['Points'], pick=cur_pick)
-        draft_WR_roster = copy.deepcopy(roster)
-        draft_WR_roster.add_player(best_WR)
-        draft_WR_roster = draft_buddy_abstract(picks,pick_round+1,player_df,draft_WR_roster, depth + 1)
-        if verbose: print(f"{best_WR.name} is {draft_WR_roster.total_points}")
-        branches.append(draft_WR_roster)
+    positions = ["QB","RB","WR","TE"]
 
-    if roster.can_draft_TE():
-        best_TE = player_df[(player_df['Position'] == 'TE') & ~player_df['Name'].isin(roster.get_TE())].sort_values(by='Points', ascending=False).iloc[0]
-        best_TE = Player(name=best_TE['Name'], pos=best_TE['Position'], points=best_TE['Points'], pick=cur_pick)
-        draft_TE_roster = copy.deepcopy(roster)
-        draft_TE_roster.add_player(best_TE)
-        draft_TE_roster = draft_buddy_abstract(picks,pick_round+1,player_df,draft_TE_roster,depth + 1)
-        if verbose: print(f"{best_TE.name} is {draft_TE_roster.total_points}")
-        branches.append(draft_TE_roster)
+    for position in positions:
+        if roster.can_draft(position):
+            best_available = player_df[(player_df['Position'] == position) & ~player_df['Name'].isin(roster.players)].sort_values(by='Points', ascending=False).iloc[0]
+            best_available = Player(name=best_available['Name'], pos=best_available['Position'], points=best_available['Points'], pick=cur_pick)
+            new_roster = copy.deepcopy(roster)
+            new_roster.add_player(best_available)
+            new_roster = draft_buddy_abstract(picks,pick_round+1,player_df,new_roster,depth+1)
+            if verbose:
+                print(f"{best_available.name} is {new_roster.total_points:.2f} and {new_roster.total_PAWS:.2f}")
+                # print(new_roster)
+            branches.append(new_roster)
 
+    # print(f'Calls: {FN_CALLS}')
+    # print(f'Calc Calls: {FN_CALLS_2}')
+    # print(f'Iterations: {LOOP_ITER} and {LOOP_ITER/FN_CALLS_2}')
     return get_best_roster(branches)
 
+
+# FN_CALLS_2 = 0
+# LOOP_ITER = 0
 def calculate_est_val(available_players,cur_pick):
+    # global FN_CALLS_2
+    # global LOOP_ITER
+    # FN_CALLS_2 += 1
     proj_points = 0
     used_prob = 0
     max_found_score,max_found_name = 0, 'Nobody'
@@ -133,68 +121,31 @@ def calculate_est_val(available_players,cur_pick):
 player_map = {}
 
 def draft_buddy_abstract(picks,pick_round,player_df,roster,depth):
-    
+    # global FN_CALLS 
+    # FN_CALLS += 1
     if depth > MAX_DEPTH or pick_round > len(picks):
         return roster
     
     branches = []
     cur_pick = picks[pick_round-1]
     # Need to figure this out
-    if roster.can_draft_QB():
-        best_available_QBs = player_df[(player_df['Position'] == 'QB') & (player_df['ADP'] >= cur_pick*.7) & ~player_df['Name'].isin(roster.get_QB())].sort_values(by='Points', ascending=False)
-        key = "QB" + str(cur_pick)
-        if key in player_map and (player_map[key][0] not in roster.get_QB()):
-            [QB_name,best_QB] = player_map[key]
-        else:
-            QB_name,best_QB = calculate_est_val(best_available_QBs,cur_pick)
-            # player_map[key] = [QB_name,best_QB]
-        best_QB = Player(name=QB_name, pos='QB', points=best_QB, pick=cur_pick)
-        draft_QB_roster = copy.deepcopy(roster)
-        draft_QB_roster.add_player(best_QB)
-        draft_QB_roster = draft_buddy_abstract(picks,pick_round+1,player_df,draft_QB_roster,depth+1)
-        branches.append(draft_QB_roster)
-    
-    if roster.can_draft_RB():
-        best_available_RBs = player_df[(player_df['Position'] == 'RB') & (player_df['ADP'] >= cur_pick*.7) & ~player_df['Name'].isin(roster.get_RB())].sort_values(by='Points', ascending=False)
-        key = "RB" + str(cur_pick)
-        if key in player_map:
-            best_RB = player_map[key]
-        else:
-            RB_name,best_RB = calculate_est_val(best_available_RBs,cur_pick)
-            best_RB = Player(name=RB_name, pos='RB', points=best_RB, pick=cur_pick)
-            # player_map[key] = best_RB
-        draft_RB_roster = copy.deepcopy(roster)
-        draft_RB_roster.add_player(best_RB)
-        draft_RB_roster = draft_buddy_abstract(picks,pick_round+1,player_df,draft_RB_roster,depth+1)
-        branches.append(draft_RB_roster)
-    
-    if roster.can_draft_WR():
-        best_available_WRs = player_df[(player_df['Position'] == 'WR') & (player_df['ADP'] >= cur_pick*.7) & ~player_df['Name'].isin(roster.get_WR())].sort_values(by='Points', ascending=False)
-        key = "WR" + str(cur_pick)
-        if key in player_map:
-            WR_name,best_WR = player_map[key]
-        else:
-            WR_name,best_WR = calculate_est_val(best_available_WRs,cur_pick)
-            # player_map[key] = (WR_name,best_WR)
-        best_WR = Player(name=WR_name, pos='WR', points=best_WR, pick=cur_pick)
-        draft_WR_roster = copy.deepcopy(roster)
-        draft_WR_roster.add_player(best_WR)
-        draft_WR_roster = draft_buddy_abstract(picks,pick_round+1,player_df,draft_WR_roster,depth+1)
-        branches.append(draft_WR_roster)
+    positions = ["QB","RB","WR","TE"]
 
-    if roster.can_draft_TE():
-        best_available_TEs = player_df[(player_df['Position'] == 'TE') & (player_df['ADP'] >= cur_pick*.7) & ~player_df['Name'].isin(roster.get_TE())].sort_values(by='Points', ascending=False)
-        key = "TE" + str(cur_pick)
-        if key in player_map:
-            TE_name,best_TE = player_map[key]
-        else:
-            TE_name,best_TE = calculate_est_val(best_available_TEs,cur_pick)
-            # player_map[key] = (TE_name,best_TE)
-        best_TE = Player(name=TE_name, pos='TE', points=best_TE, pick=cur_pick)
-        draft_TE_roster = copy.deepcopy(roster)
-        draft_TE_roster.add_player(best_TE)
-        draft_TE_roster = draft_buddy_abstract(picks,pick_round+1,player_df,draft_TE_roster,depth+1)
-        branches.append(draft_TE_roster)
+    for position in positions:
+        if roster.can_draft(position):
+            best_available = player_df[(player_df['Position'] == position) & (player_df['ADP'] >= cur_pick*.75) & ~player_df['Name'].isin(roster.players)].sort_values(by='Points', ascending=False)
+            key = position + str(cur_pick)
+            # Come back to
+            if key in player_map and not player_map[key][0] in roster.players:
+                [name,projection] = player_map[key]
+            else:
+                name,projection = calculate_est_val(best_available,cur_pick)
+                # player_map[key] = [name,projection]
+            best_available = Player(name = name,pos = position,points=projection,pick=cur_pick)
+            new_roster = copy.deepcopy(roster)
+            new_roster.add_player(best_available)
+            new_roster = draft_buddy_abstract(picks,pick_round+1,player_df,new_roster,depth+1)
+            branches.append(new_roster)
 
     return get_best_roster(branches)
 

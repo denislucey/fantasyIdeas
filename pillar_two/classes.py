@@ -25,6 +25,7 @@ class Roster:
     def __init__(self):
         self.total_points = 0
         self.starters = []
+        self.players = []
         self.total_PAWS = 0
         self.QBs = []
         self.RBs = []
@@ -81,6 +82,20 @@ class Roster:
             if len(self.TEs) <= 1:
                 self.total_points += player.points
                 self.starters.append(player.name)
+
+        self.players.append(player.name)
+
+    def can_draft(self,position):
+        if position == "QB":
+            return len(self.QBs) < 2
+        elif position == "RB":
+            return len(self.RBs) < 10
+        elif position == "WR":
+            return len(self.WRs) < 10
+        elif position == "TE":
+            return len(self.TEs) < 2
+        else:
+            return False
 
     def can_draft_QB(self):
         return len(self.QBs) < 2
@@ -143,6 +158,7 @@ class Roster:
                     self.total_points -= player.points
                     self.TEs.pop(i)
         
+        self.starters.remove(player.name)
         if player.name in self.starters:
             self.total_points -= player.points
             self.starters.remove(player.name)
