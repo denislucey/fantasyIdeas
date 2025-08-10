@@ -28,7 +28,7 @@ def sleeper_draft_buddy(draft_id: str, spot: int, thr_rr: bool):
     taken_players = sleeper_api_call(draft_id)
 
     #import players
-    players = pd.read_csv(os.path.dirname(os.path.realpath(__file__)) + '\\sheet_7_13.csv')
+    players = pd.read_csv(os.path.dirname(os.path.realpath(__file__)) + '\\sheet_8_7.csv')
 
     filtered_players = players[['Player', 'Proj Points', 'Position','Sleeper ADP']].fillna(500)
     filtered_players.columns = ['Name', 'Points', 'Position', 'ADP']
@@ -68,13 +68,13 @@ def print_bpa(pos: str, draft_id: str, amt: int):
     return
 
 
-DRAFT_ID = '1257099904996610048'
+DRAFT_ID = '1260287819801169920'
 
 def main():
     start_time = time.time()
     sleeper_draft_buddy(
         draft_id=DRAFT_ID,
-        spot=13,
+        spot=9,
         thr_rr=True)
     print(f"Exectution Time: {time.time() - start_time}")
 
