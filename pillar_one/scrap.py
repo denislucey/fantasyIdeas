@@ -12,14 +12,14 @@ features = [
 
 # creating the dataframe to get player name, id and position
 players = nfl.import_players()
-players = players[['display_name', 'gsis_id','position','birth_date', 'rookie_year']]
+players = players[['display_name', 'gsis_id','position','birth_date', 'rookie_season']]
 players.rename(columns={'display_name': 'full_name', 'gsis_id': 'player_id'}, inplace=True)
 players = players.dropna(subset=['birth_date'])
 players['birth_year'] = players['birth_date'].str.split('-').str[0].astype(int)
 
 
 df = nfl.import_seasonal_data(range(2013, 2025),"REG")
-merged_df = df.merge(players[['player_id', 'full_name', 'position','rookie_year','birth_year']], on='player_id', how='left')
+merged_df = df.merge(players[['player_id', 'full_name', 'position','rookie_season','birth_year']], on='player_id', how='left')
 
 def create_new_columns(df: pd.DataFrame, pos: str,feature_list: list) -> pd.DataFrame:
     # ONLY FOR WR RIGHT NOW
@@ -49,11 +49,11 @@ def project_top_x_players_for_position(x: int, pos: str) -> None:
 
     pos_df = merged_df[merged_df['position'] == pos]
     pos_df = pos_df.sort_values(by=['full_name', 'season'])
-    pos_df = create_new_columns(pos_df, pos,base_feature_list)
-    pos_df['years_in_league'] = pos_df['season'] - pos_df['rookie_year']
+    # pos_df = create_new_columns(pos_df, pos,base_feature_list)
+    pos_df['years_in_league'] = pos_df['season'] - pos_df['rookie_season']
     pos_df['age'] = pos_df['season'] - pos_df['birth_year']
     pos_df['next_season_fantasy_points_ppr'] = pos_df.groupby('player_id')['fantasy_points_ppr'].shift(-1)
-    pos_df['next_season_fantasy_points_ppr_per_game'] = pos_df.groupby('player_id')['fantasy_points_ppr_per_game'].shift(-1)
+    # pos_df['next_season_fantasy_points_ppr_per_game'] = pos_df.groupby('player_id')['fantasy_points_ppr_per_game'].shift(-1)
     
     feature_list = base_feature_list.copy()
     
@@ -106,8 +106,8 @@ def main() -> str:
     # getting the data from 2015 to 2024
     # ML stuff that I need to better understand
     # project_top_x_players_for_position(35, 'QB')
-    # project_top_x_players_for_position(45, 'RB')
-    project_top_x_players_for_position(45, 'WR')
+    project_top_x_players_for_position(45, 'RB')
+    # project_top_x_players_for_position(45, 'WR')
     # project_top_x_players_for_position(25, 'TE')
     return "Yes"
 

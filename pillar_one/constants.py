@@ -4,7 +4,7 @@ class RandomForestFeatures(Enum):
 
     RB_FEATURES = [
         # Yearly stats
-    'carries', 'rushing_yards', 'rush_ypc', 'rush_ypg', 'fantasy_ppr_ppg',
+    'carries', 'rushing_yards', 'fantasy_ppr_ppg',
     'rushing_tds', 'rushing_fumbles', 'rushing_fumbles_lost',
     'rushing_first_downs', 'rushing_epa',
     'receptions', 'targets', 'receiving_yards', 'receiving_tds',

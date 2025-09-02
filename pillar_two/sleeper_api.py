@@ -6,6 +6,7 @@ from scipy.stats import norm
 import pandas as pd
 import os
 import time
+import tracemalloc
 
 def sleeper_api_call(draft_id: str):
     draft_results = Drafts.get_all_picks_in_draft(draft_id)
@@ -28,7 +29,7 @@ def sleeper_draft_buddy(draft_id: str, spot: int, thr_rr: bool):
     taken_players = sleeper_api_call(draft_id)
 
     #import players
-    players = pd.read_csv(os.path.dirname(os.path.realpath(__file__)) + '\\sheet_8_7.csv')
+    players = pd.read_csv(os.path.dirname(os.path.realpath(__file__)) + '\\sheet_8_25.csv')
 
     filtered_players = players[['Player', 'Proj Points', 'Position','Sleeper ADP']].fillna(500)
     filtered_players.columns = ['Name', 'Points', 'Position', 'ADP']
@@ -59,7 +60,7 @@ def sleeper_draft_buddy(draft_id: str, spot: int, thr_rr: bool):
 
 def print_bpa(pos: str, draft_id: str, amt: int):
     taken_players = sleeper_api_call(draft_id)
-    players = pd.read_csv(os.path.dirname(os.path.realpath(__file__)) + '\\sheet_7_13.csv')
+    players = pd.read_csv(os.path.dirname(os.path.realpath(__file__)) + '\\sheet_8_25.csv')
 
     filtered_players = players[['Player', 'Proj Points', 'Position','Sleeper ADP','PARL']].fillna(500)
     filtered_players.columns = ['Name', 'Points', 'Position', 'ADP','PARL']
@@ -68,18 +69,18 @@ def print_bpa(pos: str, draft_id: str, amt: int):
     return
 
 
-DRAFT_ID = '1260287819801169920'
+DRAFT_ID = '1253495736151052288'
 
 def main():
     start_time = time.time()
     sleeper_draft_buddy(
         draft_id=DRAFT_ID,
-        spot=9,
+        spot=15,
         thr_rr=True)
     print(f"Exectution Time: {time.time() - start_time}")
 
-main()
-# print_bpa('WR',DRAFT_ID,3)
-# print_bpa('RB',DRAFT_ID,3)
-# print_bpa('TE',DRAFT_ID,3)
-# print_bpa('QB',DRAFT_ID,3)
+# main()
+print_bpa('WR',DRAFT_ID,5)
+print_bpa('RB',DRAFT_ID,5)
+print_bpa('TE',DRAFT_ID,5)
+print_bpa('QB',DRAFT_ID,5)

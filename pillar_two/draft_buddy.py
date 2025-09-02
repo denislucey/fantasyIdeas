@@ -5,7 +5,7 @@ from draft_picks import get_picks
 from classes import Roster, Player
 from scipy.stats import norm
 
-MAX_DEPTH = 8
+MAX_DEPTH = 7
 # FN_CALLS = 0
 
 def draft_buddy_wrapper(pick: int, thr_rr: bool = False):
@@ -91,9 +91,6 @@ def draft_buddy_selective(picks,pick_round,player_df,roster,depth,verbose):
                 print(f"{best_available.name} is {new_roster.total_points:.2f} and {new_roster.total_PAWS:.2f}")
                 # print(new_roster)
             branches.append(new_roster)
-
-    for roster in branches:
-        print(roster)
     return get_best_roster(branches)
 
 
@@ -109,7 +106,7 @@ def calculate_est_val(available_players,cur_pick):
     i = 0
     while used_prob < 0.95:
         cur_player = available_players.iloc[i]
-        chance_of_getting = 1 - norm.cdf(cur_pick, loc = cur_player['ADP'], scale = cur_player['ADP']/12)
+        chance_of_getting = 1 - norm.cdf(cur_pick, loc = cur_player['ADP']*.9, scale = cur_player['ADP']/12)
         value_added = cur_player['Points'] * chance_of_getting * (1-used_prob)
         if value_added > max_found_score:
             max_found_score,max_found_name = value_added,cur_player['Name']
@@ -141,7 +138,7 @@ def draft_buddy_abstract(picks,pick_round,player_df,roster,depth):
                 [name,projection] = player_map[key]
             else:
                 name,projection = calculate_est_val(best_available,cur_pick)
-                player_map[key] = [name,projection]
+                # player_map[key] = [name,projection]
             best_available = Player(name = name,pos = position,points=projection,pick=cur_pick)
             new_roster = copy.deepcopy(roster)
             new_roster.add_player(best_available)

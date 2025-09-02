@@ -1,7 +1,9 @@
 import pandas as pd
 import os
 
-all_players = pd.read_csv(os.path.dirname(os.path.realpath(__file__)) + '\\sheet_7_13.csv')
+
+# Initial mem: 692653
+all_players = pd.read_csv(os.path.dirname(os.path.realpath(__file__)) + '\\sheet_8_25.csv')
 
 RB_worst_starter = all_players[all_players['Position'] == 'RB'].sort_values(by='Proj Points', ascending=False).iloc[31]['Proj Points']
 QB_worst_starter = all_players[all_players['Position'] == 'QB'].sort_values(by='Proj Points', ascending=False).iloc[15]['Proj Points']
@@ -73,7 +75,7 @@ class Roster:
         elif player.pos == 'RB':
             self.RBs.append(player)
             self.total_PAWS += (player.points - RB_worst_starter)
-            if len(self.RBs) <= 2:
+            if len(self.RBs) <= 3:
                 self.total_points += player.points
                 self.starters.append(player.name)
         elif player.pos == 'TE':
