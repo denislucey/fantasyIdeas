@@ -22,7 +22,41 @@ def sleeper_api_call(draft_id: str):
 
     return new_draft_results
 
-def grade_draft(draft_id,verbose = False):
+def add_new_player(roster,position,points,name):
+    potential_add = [name,points]
+    if position == 'QB' and roster['QB'][1] < points:
+        roster['QB'] = potential_add
+    elif position == 'RB':
+        if points > roster['RB1'][1]:
+            potential_flex = roster['RB2']
+            roster['RB2'] = roster['RB1']
+            roster['RB1'] = potential_add
+            if potential_flex[1] > roster['FLEX'][1]: roster['FLEX'] = potential_flex
+        elif points > roster['RB2'][1]:
+            potential_flex = roster['RB2']
+            roster['RB2'] = potential_add
+            if potential_flex[1] > roster['FLEX'][1]: roster['FLEX'] = potential_flex
+        elif points > roster['FLEX'][1]: roster['FLEX'] = potential_add
+    elif position == 'WR':
+        if points > roster['WR1'][1]:
+            potential_flex = roster['WR2']
+            roster['WR2'] = roster['WR1']
+            roster['WR1'] = potential_add
+            if potential_flex[1] > roster['FLEX'][1]: roster['FLEX'] = potential_flex
+        elif points > roster['WR2'][1]:
+            potential_flex = roster['WR2']
+            roster['WR2'] = potential_add
+            if potential_flex[1] > roster['FLEX'][1]: roster['FLEX'] = potential_flex
+        elif points > roster['FLEX'][1]: roster['FLEX'] = potential_add
+    elif position == 'TE':
+        if points > roster['TE'][1]:
+            potential_flex = roster['TE']
+            roster['TE'] = potential_add
+            if potential_flex[1] > roster['FLEX'][1]: roster['FLEX'] = potential_flex
+        elif points > roster['FLEX'][1]: roster['FLEX'] = potential_add
+    return roster
+
+def grade_draft(draft_id,verbose = False,starters_only = False, use_surplus = True):
     player_data = pd.read_csv(os.path.dirname(os.path.realpath(__file__)) + '\\PlayerStats2024.csv')
 
     filtered_players = player_data[['Player', 'PPR','PosRank','OvRank']].fillna(0)
@@ -45,17 +79,41 @@ def grade_draft(draft_id,verbose = False):
             else:
                 my_players.append(players_in_order[pick-1])
         team_surplus = 0
+        # QB, RB1, RB2, WR1, WR2, TE, Flex
+        best_starters = {
+            'QB':["Fake Player",0],
+            'RB1':["Fake Player",0],
+            'RB2':["Fake Player",0],
+            'WR1':["Fake Player",0],
+            'WR2':["Fake Player",0],
+            'TE':["Fake Player",0],
+            'FLEX':["Fake Player",0]
+        }
         for player in my_players:
             if player[1] in ['WR','RB','TE','QB']:
                 name = player[0]
-                their_points = filtered_players.loc[name,'PPR']
-                their_surplus = max(0,their_points - baseline[player[1]])
-                if verbose: print(f"{name} scored {their_surplus:.2f} surplus Points")
-                team_surplus += their_surplus
+                try:
+                    their_points = filtered_players.loc[name,'PPR']
+                except KeyError:
+                    their_points = 0
+                if starters_only:
+                    best_starters = add_new_player(best_starters,player[1],their_points,name)
+                else:
+                    if use_surplus:
+                        their_surplus = max(0,their_points - baseline[player[1]])
+                        if verbose: print(f"{name} scored {their_surplus:.2f} surplus Points")
+                    else:
+                        their_surplus = their_points
+                        if verbose: print(f"{name} scored {their_surplus:.2f} Points")
+                    team_surplus += their_surplus
             else:
-                if verbose: print("Kicker or Defense")
+                if verbose and not starters_only: print("Kicker or Defense")
+        if starters_only:
+            for player in best_starters.keys():
+                team_surplus += best_starters[player][1]
+                if verbose: print(f"{player}: {best_starters[player][0]} scored {best_starters[player][1]}")
         draft_values[username] = team_surplus
-        if verbose: print(f'Total Suplus that {username} Drafted = {team_surplus:.2f}')
+        if verbose: print(f'Total Surplus that {username} Drafted = {team_surplus:.2f}')
 
     df = pd.DataFrame(draft_values.items())
     print(df.sort_values(1,ascending=False).head(16))
@@ -63,7 +121,11 @@ def grade_draft(draft_id,verbose = False):
     
 
 beerat_2024_draft_id = '1126950126565609472'
+beerat_2025_draft_id = '1253495736151052288'
 
 def main():
-    print(grade_draft(beerat_2024_draft_id,True))
+    print(grade_draft(beerat_2024_draft_id,
+                      verbose = True,
+                      starters_only = False,
+                      use_surplus = True))
 main()
