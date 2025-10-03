@@ -4,10 +4,18 @@ import pandas as pd
 import os
 
 # These numbers pulled manually
-baseline = {'QB': 119.1, # 31 QBs, Justin Fields
+baseline_2024 = {'QB': 119.1, # 31 QBs, Justin Fields
             'RB': 54.7, # 66 RBs, Emari Demarcado
             'WR': 92.4, # 87 WRs, Tim Patrick
             'TE': 103.6 } # 27 TEs, Dallas Goedert
+
+baseline_2025 = {'QB': 33.1,#28 
+                 'RB': 3.9,#72,
+                 'WR': 12.7,#82, 
+                 'TE': 15.3,#27, 
+                 'K': 0,#14, 
+                 'DEF': 0 #17
+                 }
 
 def sleeper_api_call(draft_id: str):
     draft_results = Drafts.get_all_picks_in_draft(draft_id)
@@ -56,11 +64,33 @@ def add_new_player(roster,position,points,name):
         elif points > roster['FLEX'][1]: roster['FLEX'] = potential_add
     return roster
 
-def grade_draft(draft_id,verbose = False,starters_only = False, use_surplus = True):
-    player_data = pd.read_csv(os.path.dirname(os.path.realpath(__file__)) + '\\PlayerStats2024.csv')
+def grade_draft(draft_id,verbose = False,starters_only = False, use_surplus = True,year=2024):
+    player_data = pd.read_csv(os.path.dirname(os.path.realpath(__file__)) + f'\\PlayerStats{year}.csv')
 
     filtered_players = player_data[['Player', 'PPR','PosRank','OvRank']].fillna(0)
+
+    player_map = {
+        "Brian Robinson Jr.": "Brian Robinson",
+        "D.J. Moore": "DJ Moore",
+        "Tre Harris": "Tre' Harris",
+        "Kenneth Walker III": "Kenneth Walker",
+        "Calvin Austin III": "Calvin Austin",
+        "Marquise Brown": "Hollywood Brown",
+        "D.K. Metcalf": "DK Metcalf",
+        "Michael Pittman Jr.": "Michael Pittman",
+        "Tyrone Tracy Jr.": "Tyrone Tracy",
+        "Josh Palmer": "Joshua Palmer",
+        "Demario Douglas": "DeMario Douglas",
+        "Marvin Harrison Jr.": "Marvin Harrison",
+        "Chigoziem Okonkwo": "Chig Okonkwo"
+    }
+
+    filtered_players['Player'] = filtered_players['Player'].map(player_map).fillna(filtered_players['Player'])
     filtered_players = filtered_players.set_index('Player')
+
+
+    if year == 2024: baseline = baseline_2024 
+    else: baseline = baseline_2025
 
     beerat_draft = Drafts.get_specific_draft(draft_id)
     player_ids = beerat_draft['draft_order'].keys()
@@ -95,6 +125,7 @@ def grade_draft(draft_id,verbose = False,starters_only = False, use_surplus = Tr
                 try:
                     their_points = filtered_players.loc[name,'PPR']
                 except KeyError:
+                    print(name)
                     their_points = 0
                 if starters_only:
                     best_starters = add_new_player(best_starters,player[1],their_points,name)
@@ -124,8 +155,9 @@ beerat_2024_draft_id = '1126950126565609472'
 beerat_2025_draft_id = '1253495736151052288'
 
 def main():
-    print(grade_draft(beerat_2024_draft_id,
+    print(grade_draft(beerat_2025_draft_id,
                       verbose = True,
                       starters_only = False,
-                      use_surplus = True))
+                      use_surplus = True,
+                      year=2025))
 main()
